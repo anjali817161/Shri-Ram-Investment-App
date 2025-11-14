@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shreeram_investment_app/modules/more/view/more_view.dart';
 import 'package:shreeram_investment_app/modules/portfolio/view/portfolio_view.dart';
+import 'package:shreeram_investment_app/modules/profile/view/profile_view.dart';
+import 'package:shreeram_investment_app/modules/refer/view/refer_page.dart';
 import '../home/view/home_view.dart' as home_view;
 
 class BottomNavBar extends StatelessWidget {
@@ -27,10 +29,12 @@ class BottomNavBar extends StatelessWidget {
             break;
           case 2:
             // navigate to ReferAndEarnView()
+            Get.off(() => ReferEarnScreen());
+
             break;
           case 3:
             // navigate to MoreView()
-                Get.off(() => MorePage());
+                Get.off(() => ProfilePage());
 
             break;
         }

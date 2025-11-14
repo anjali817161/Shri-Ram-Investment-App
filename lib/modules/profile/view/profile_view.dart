@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shreeram_investment_app/modules/bankdetails/view/bank_details.dart';
 import '../controller/profile_controller.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -71,16 +72,21 @@ class ProfilePage extends StatelessWidget {
                     ],
                   ),
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.red.shade400,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  child: const Text(
-                    "KYC pending",
-                    style: TextStyle(color: Colors.white, fontSize: 12),
+                GestureDetector(
+                  onTap: (){
+                    Get.to(() => BankDetailsPage());
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade400,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    child: const Text(
+                      "KYC pending",
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
                   ),
                 ),
               ],
@@ -143,30 +149,27 @@ class ProfilePage extends StatelessWidget {
               onTap: controller.openGeneralDetails,
             ),
             _buildMenuItem(
+              icon: Icons.account_balance_outlined,
+              title: "Bank details",
+              onTap: controller.openBankDetails,
+            ),
+            _buildMenuItem(
               icon: Icons.file_download_outlined,
               title: "Reports & documents",
               onTap: controller.openReports,
             ),
             _buildMenuItem(
-              icon: Icons.folder_shared_outlined,
-              title: "Bond demat details",
-              onTap: controller.openDematDetails,
-            ),
-            _buildMenuItem(
               icon: Icons.account_balance_outlined,
-              title: "Bond bank details",
+              title: "Payment methods",
               onTap: controller.openBankDetails,
             ),
+            
             _buildMenuItem(
-              icon: Icons.shield_outlined,
-              title: "Security",
+              icon: Icons.logout_outlined,
+              title: "Logout",
               onTap: controller.openSecurity,
             ),
-            _buildMenuItem(
-              icon: Icons.info_outline,
-              title: "About",
-              onTap: controller.openAbout,
-            ),
+           
           ],
         ),
       ),

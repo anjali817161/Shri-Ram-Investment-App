@@ -10,27 +10,30 @@ class InvestmentHomeScreen extends StatelessWidget {
   final List<Map<String, dynamic>> popularList = [
     {
       "rank": 1,
-      "name": "U GRO-3 Aug'25",
-      "rate": "11.5%",
+      "name": "Punjab National Bank",
+      "image": "assets/images/pnb_logo.png",
+      "rate": "6.6%",
       "oldRate": "11.25%",
-      "duration": "3–17 months",
+      "duration": "12 months",
       "color": Colors.amber
     },
     {
       "rank": 2,
-      "name": "Navi-2 Apr'25",
-      "rate": "11.25%",
+      "name": "Indian Post Payment Bank",
+      "image": "assets/images/post_logo.png",
+      "rate": "6.9%",
       "oldRate": "11%",
-      "duration": "3–7 months",
-      "color": Colors.blueGrey
+      "duration": "12 months",
+      "color": const Color.fromARGB(255, 147, 190, 211)
     },
     {
       "rank": 3,
-      "name": "LTG-4 Dec'25",
+      "name": "Shri Ram Investment",
+      "image": "assets/images/shri_icon.png",
       "rate": "10.9%",
       "oldRate": "10.5%",
-      "duration": "6–12 months",
-      "color": Colors.brown
+      "duration": "24 months",
+      "color": const Color.fromARGB(255, 198, 143, 123)
     },
   ];
 
@@ -51,14 +54,14 @@ class InvestmentHomeScreen extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Image.asset('assets/images/money1.png', height: 32),
-                     SizedBox(width: 130,),
+                      Image.asset('assets/images/shri_icon.png', height: 45),
+                     SizedBox(width: 128,),
                       const Text(
-                        "Shri Ram Investment",
+                        "Shree Ram Investment",
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                          fontSize: 15,
                         ),
                       ),
                     ],
@@ -315,23 +318,32 @@ class InvestmentHomeScreen extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              Row(
                                 children: [
-                                  Text(item["name"],
-                                      style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500)),
-                                  const SizedBox(height: 6),
-                                  Text(item["duration"],
-                                      style: const TextStyle(
-                                          color: Colors.white54, fontSize: 13)),
+                                   Image.asset(item["image"], height: 35),
+                     SizedBox(width: 12,),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(item["name"],
+                                          style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500)),
+                                      const SizedBox(height: 6),
+                                      Text("Tenure:" + item["duration"],
+                                          style: const TextStyle(
+                                              color: Colors.white54, fontSize: 13)),
+                                    ],
+                                  ),
                                 ],
                               ),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
+                                  Text("YTM upto",
+                                      style: const TextStyle(
+                                          color: Colors.white54, fontSize: 13)),
                                   Text(item["rate"],
                                       style: const TextStyle(
                                           color: Colors.white,

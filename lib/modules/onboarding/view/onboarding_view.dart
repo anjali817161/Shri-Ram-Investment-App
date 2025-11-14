@@ -113,8 +113,8 @@ class _OnboardingViewState extends State<OnboardingView> {
                   ),
                 ),
                 onPressed: () {
-                  // Get.to(() => LoginScreen());
-                   Get.to(() => InvestmentHomeScreen());
+                  Get.to(() => LoginScreen());
+                  //  Get.to(() => InvestmentHomeScreen());
                 },
                 child: const Text(
                   'Get Started',
