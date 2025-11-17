@@ -22,54 +22,59 @@ class DocumentsPage extends StatelessWidget {
 
       body: Padding(
         padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-
-            const Text(
-              "📄 User Documents",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-
-            const SizedBox(height: 10),
-
-            const Text(
-              "Click below to generate and download your Fixed Deposit Certificate.",
-              style: TextStyle(
-                color: Colors.white54,
-                fontSize: 15,
-              ),
-            ),
-
-            const SizedBox(height: 35),
-
-            // Download Button
-            GestureDetector(
-              onTap: () => controller.generateCertificatePdf(),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: Colors.blueAccent,
+        child: Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+          
+              const Text(
+                "📄 User Documents",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
                 ),
-                child: const Center(
-                  child: Text(
-                    "Download Bond Certificate",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+              ),
+          
+              const SizedBox(height: 10),
+          
+              Center(
+                child: const Text(
+                  "Click below to generate and download your Fixed Deposit Certificate.",
+                  style: TextStyle(
+                    color: Colors.white54,
+                    fontSize: 15,
                   ),
                 ),
               ),
-            )
-          ],
+          
+              const SizedBox(height: 35),
+          
+              // Download Button
+              GestureDetector(
+                onTap: () => controller.generateCertificatePdf(),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.white,
+                  ),
+                  child: const Center(
+                    child: Text(
+                      "Download Bond Certificate",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

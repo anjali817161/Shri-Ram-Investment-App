@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:shreeram_investment_app/modules/navbar/bottom_navbar.dart';
+import 'package:shreeram_investment_app/modules/portfolio/view/portfolio_view.dart';
 import '../controller/home_controller.dart';
 
 class InvestmentHomeScreen extends StatelessWidget {
@@ -30,9 +31,9 @@ class InvestmentHomeScreen extends StatelessWidget {
       "rank": 3,
       "name": "Shri Ram Investment",
       "image": "assets/images/shri_icon.png",
-      "rate": "10.9%",
-      "oldRate": "10.5%",
-      "duration": "24 months",
+      "rate": "12%",
+      "oldRate": "15.5%",
+      "duration": "0-24 months",
       "color": const Color.fromARGB(255, 198, 143, 123)
     },
   ];
@@ -57,7 +58,7 @@ class InvestmentHomeScreen extends StatelessWidget {
                       Image.asset('assets/images/shri_icon.png', height: 45),
                      SizedBox(width: 128,),
                       const Text(
-                        "Shree Ram Investment",
+                        "Shri Ram Investment",
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -223,8 +224,9 @@ class InvestmentHomeScreen extends StatelessWidget {
                           style: const TextStyle(
                               color: Colors.white70, fontSize: 14)),
                       const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(bond.name,
                               style: const TextStyle(
@@ -243,7 +245,7 @@ class InvestmentHomeScreen extends StatelessWidget {
               const SizedBox(height: 30),
 
               // 🔹 Categories
-              const Text("SELECT A CATEGORY",
+              const Text("CATEGORIES",
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 14,
@@ -282,87 +284,92 @@ class InvestmentHomeScreen extends StatelessWidget {
               Column(
                 children: List.generate(popularList.length, (index) {
                   final item = popularList[index];
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1C1C1E),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                          color: item["color"].withOpacity(0.4), width: 1.2),
-                    ),
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          top: 0,
-                          left: 0,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: item["color"],
-                              borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(14),
-                                  bottomRight: Radius.circular(14)),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 4),
-                            child: Text(
-                              "${item["rank"]}",
-                              style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 35, 16, 14),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                   Image.asset(item["image"], height: 35),
-                     SizedBox(width: 12,),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(item["name"],
-                                          style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500)),
-                                      const SizedBox(height: 6),
-                                      Text("Tenure:" + item["duration"],
-                                          style: const TextStyle(
-                                              color: Colors.white54, fontSize: 13)),
-                                    ],
-                                  ),
-                                ],
+                  return GestureDetector(
+                    onTap: () {
+                      Get.to(() => PortfolioView());
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1C1C1E),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                            color: item["color"].withOpacity(0.4), width: 1.2),
+                      ),
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            top: 0,
+                            left: 0,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: item["color"],
+                                borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(14),
+                                    bottomRight: Radius.circular(14)),
                               ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text("YTM upto",
-                                      style: const TextStyle(
-                                          color: Colors.white54, fontSize: 13)),
-                                  Text(item["rate"],
-                                      style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold)),
-                                  Text(
-                                    item["oldRate"],
-                                    style: const TextStyle(
-                                      color: Colors.redAccent,
-                                      fontSize: 12,
-                                      decoration: TextDecoration.lineThrough,
-                                    ),
-                                  ),
-                                ],
-                              )
-                            ],
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 4),
+                              child: Text(
+                                "${item["rank"]}",
+                                style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
                           ),
-                        ),
-                      ],
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 35, 16, 14),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                     Image.asset(item["image"], height: 35),
+                       SizedBox(width: 12,),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(item["name"],
+                                            style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500)),
+                                        const SizedBox(height: 6),
+                                        Text("Tenure:" + item["duration"],
+                                            style: const TextStyle(
+                                                color: Colors.white54, fontSize: 13)),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text("YTM upto",
+                                        style: const TextStyle(
+                                            color: Colors.white54, fontSize: 13)),
+                                    Text(item["rate"],
+                                        style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold)),
+                                    Text(
+                                      item["oldRate"],
+                                      style: const TextStyle(
+                                        color: Colors.redAccent,
+                                        fontSize: 12,
+                                        decoration: TextDecoration.lineThrough,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 }),

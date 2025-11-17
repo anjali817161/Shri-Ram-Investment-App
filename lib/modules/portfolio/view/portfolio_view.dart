@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shreeram_investment_app/modules/bonds/view/bonds_view.dart';
+import 'package:shreeram_investment_app/modules/invest_form/view/invest_form.dart';
 import 'package:shreeram_investment_app/modules/navbar/bottom_navbar.dart';
 
 class PortfolioView extends StatefulWidget {
@@ -216,9 +217,9 @@ class _PortfolioViewState extends State<PortfolioView>
                     children: [
                       GestureDetector(
                         onTap: (){
-                          Get.to(() => BondsPage());
+                          Get.to(() => InvestmentDetailsPage());
                         },
-                        child: Text("Explore Bonds",
+                        child: Text("Invest now",
                             style: const TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.w700,
@@ -279,7 +280,7 @@ class _PortfolioViewState extends State<PortfolioView>
                   ),
                 ),
                 const SizedBox(height: 18),
-                _buildPrimaryButton("Explore Bonds"),
+                _buildPrimaryButton("Invest now"),
               ],
             ),
           ),
@@ -404,7 +405,7 @@ class _PortfolioViewState extends State<PortfolioView>
   Widget _buildPrimaryButton(String title) {
     return GestureDetector(
       onTap: () {
-        Get.to(() => BondsPage());
+        Get.to(() => InvestmentDetailsPage());
       },
       child: Container(
         width: double.infinity,

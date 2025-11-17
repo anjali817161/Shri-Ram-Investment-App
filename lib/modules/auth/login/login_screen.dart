@@ -117,8 +117,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             backgroundColor: Colors.green,
                           ),
                         );
-                        Get.to(() => OtpVerificationScreen(
-                              phoneNumber: completePhoneNumber,
+                        Get.to(() => OtpVerificationScreen(receiver: completePhoneNumber, method: 'phone',
+                              
                             ));
                       }
                     }

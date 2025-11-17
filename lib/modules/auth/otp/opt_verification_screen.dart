@@ -1,13 +1,20 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/utils.dart';
 import 'package:pinput/pinput.dart';
+import 'package:shreeram_investment_app/modules/auth/basic_details/view/basic_details.dart';
+import 'package:shreeram_investment_app/modules/auth/basic_info/view/basic_info.dart';
 import 'package:shreeram_investment_app/modules/auth/mpin/set_mpin_screen.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
-  final String phoneNumber;
-  const OtpVerificationScreen({super.key, required this.phoneNumber});
+  final String receiver; // can be phone OR email
+  final String method;   // "phone" or "email"
+
+  const OtpVerificationScreen({
+    super.key,
+    required this.receiver,
+    required this.method,
+  });
 
   @override
   State<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
@@ -44,29 +51,40 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     super.dispose();
   }
 
-  void _verifyOtp() {
-    if (_otpController.text.length == 4) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('OTP Verified Successfully'),
-          backgroundColor: Colors.green,
-        ),
-      );
-      Get.off(() => SetMpinScreen());
+void _verifyOtp() {
+  if (_otpController.text.length == 6) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('OTP Verified Successfully'),
+        backgroundColor: Colors.green,
+      ),
+    );
+
+    // 🔥 Navigate based on method
+    if (widget.method == "phone") {
+      // 👉 If Phone OTP Verified 
+      Get.offAll(() => BasicInfoFormPage());  
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Invalid OTP. Please try again.'),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
+      // 👉 If Email OTP Verified
+      Get.off(() => UserBasicDetailsPage());
     }
+
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Invalid OTP. Please try again.'),
+        backgroundColor: Colors.redAccent,
+      ),
+    );
   }
+}
+
 
   void _resendOtp() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('OTP resent successfully'),
+      SnackBar(
+        content: Text(
+            'OTP resent to your ${widget.method == "phone" ? "mobile" : "email"}'),
         backgroundColor: Colors.green,
       ),
     );
@@ -76,8 +94,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     final pinTheme = PinTheme(
-      width: 60,
-      height: 60,
+      width: 55,
+      height: 55,
       textStyle: const TextStyle(
         fontSize: 22,
         color: Colors.white,
@@ -106,6 +124,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
+
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -113,6 +132,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
+
               const Text(
                 "Enter OTP",
                 style: TextStyle(
@@ -121,46 +141,51 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+
               const SizedBox(height: 10),
+
               Row(
                 children: [
                   Expanded(
                     child: Text(
-                      "We've sent an OTP to ${widget.phoneNumber}",
-                      style: const TextStyle(
-                        color: Colors.grey,
-                        fontSize: 15,
-                      ),
+                      widget.method == "phone"
+                          ? "We've sent an OTP to your mobile ${widget.receiver}"
+                          : "We've sent an OTP to your email ${widget.receiver}",
+                      style:
+                          const TextStyle(color: Colors.grey, fontSize: 15),
                     ),
                   ),
+
+                  // Edit button
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.edit, color: Colors.white, size: 20),
+                    icon: const Icon(Icons.edit, color: Colors.white),
                   ),
                 ],
               ),
+
               const SizedBox(height: 50),
 
-              // ✅ Center OTP Boxes
+              // Centered OTP input
               Center(
                 child: Pinput(
                   controller: _otpController,
-                  length: 4,
+                  length: 6,
                   keyboardType: TextInputType.number,
                   defaultPinTheme: pinTheme,
                   focusedPinTheme: focusedPinTheme,
                 ),
               ),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 15),
 
-              // ✅ Resend OTP bottom-right corner under boxes
               Align(
                 alignment: Alignment.centerRight,
                 child: _secondsRemaining > 0
                     ? Text(
                         "Resend OTP in ${_secondsRemaining}s",
-                        style: const TextStyle(color: Colors.grey, fontSize: 14),
+                        style:
+                            const TextStyle(color: Colors.grey, fontSize: 14),
                       )
                     : GestureDetector(
                         onTap: _resendOtp,
@@ -177,20 +202,18 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
               const Spacer(),
 
-              // ✅ Verify OTP button fixed at bottom
               SizedBox(
                 width: double.infinity,
                 height: 55,
-                child: ElevatedButton.icon(
+                child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:  Colors.white,
+                    backgroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                   onPressed: _verifyOtp,
-                  icon: const Icon(Icons.verified, color: Colors.black),
-                  label: const Text(
+                  child: const Text(
                     "Verify OTP",
                     style: TextStyle(
                       color: Colors.black,
@@ -201,7 +224,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 25),
             ],
           ),
         ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shreeram_investment_app/modules/bankdetails/view/bank_details.dart';
+import 'package:shreeram_investment_app/modules/home/view/home_view.dart';
 import '../controller/profile_controller.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -17,7 +18,7 @@ class ProfilePage extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Get.back(),
+          onPressed: () => Get.offAll(() => InvestmentHomeScreen()),
         ),
         title: const Text(
           "Profile Details",
@@ -95,50 +96,50 @@ class ProfilePage extends StatelessWidget {
             const SizedBox(height: 20),
 
             // KYC Reminder Section
-            const Text(
-              "COMPLETE BONDS KYC",
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: 13,
-                letterSpacing: 0.5,
-              ),
-            ),
-            const SizedBox(height: 8),
-            GestureDetector(
-              onTap: controller.completeKYC,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFFB38200),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                child: Row(
-                  children: [
-                    Container(
-                      decoration: const BoxDecoration(
-                        color: Colors.amber,
-                        shape: BoxShape.circle,
-                      ),
-                      padding: const EdgeInsets.all(6),
-                      child: const Icon(Icons.access_time,
-                          color: Colors.black, size: 20),
-                    ),
-                    const SizedBox(width: 12),
-                    const Expanded(
-                      child: Text(
-                        "You left your KYC midway\nComplete KYC →",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          height: 1.3,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            // const Text(
+            //   "COMPLETE BONDS KYC",
+            //   style: TextStyle(
+            //     color: Colors.grey,
+            //     fontSize: 13,
+            //     letterSpacing: 0.5,
+            //   ),
+            // ),
+            // const SizedBox(height: 8),
+            // GestureDetector(
+            //   onTap: controller.completeKYC,
+            //   child: Container(
+            //     decoration: BoxDecoration(
+            //       color: const Color(0xFFB38200),
+            //       borderRadius: BorderRadius.circular(8),
+            //     ),
+            //     padding:
+            //         const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            //     child: Row(
+            //       children: [
+            //         Container(
+            //           decoration: const BoxDecoration(
+            //             color: Colors.amber,
+            //             shape: BoxShape.circle,
+            //           ),
+            //           padding: const EdgeInsets.all(6),
+            //           child: const Icon(Icons.access_time,
+            //               color: Colors.black, size: 20),
+            //         ),
+            //         const SizedBox(width: 12),
+            //         const Expanded(
+            //           child: Text(
+            //             "You left your KYC midway\nComplete KYC →",
+            //             style: TextStyle(
+            //               color: Colors.white,
+            //               fontSize: 14,
+            //               height: 1.3,
+            //             ),
+            //           ),
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+            // ),
 
             const SizedBox(height: 20),
 
@@ -158,11 +159,11 @@ class ProfilePage extends StatelessWidget {
               title: "Reports & documents",
               onTap: controller.openReports,
             ),
-            _buildMenuItem(
-              icon: Icons.account_balance_outlined,
-              title: "Payment methods",
-              onTap: controller.openBankDetails,
-            ),
+            // _buildMenuItem(
+            //   icon: Icons.account_balance_outlined,
+            //   title: "Payment methods",
+            //   onTap: controller.openBankDetails,
+            // ),
             
             _buildMenuItem(
               icon: Icons.logout_outlined,

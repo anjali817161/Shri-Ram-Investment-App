@@ -22,11 +22,11 @@ class HomeController extends GetxController {
   void loadBonds() {
     bonds.value = [
       Bond(
-        name: "Navi-2 Apr'25",
-        rate: 11.25,
-        maturity: "3–7 months left",
-        minInvestment: 10000,
-        status: "99% Sold",
+        name: "Shri Ram Investment - 17 Nov 2025",
+        rate: 12,
+        maturity: "0-24 months",
+        minInvestment: 500000,
+        status: "90% Sold",
       ),
     ];
   }

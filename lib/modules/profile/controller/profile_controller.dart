@@ -1,4 +1,6 @@
 import 'package:get/get.dart';
+import 'package:shreeram_investment_app/modules/auth/bank_info/bank_info.dart';
+import 'package:shreeram_investment_app/modules/auth/login/login_screen.dart';
 import 'package:shreeram_investment_app/modules/profile/widgets/documents_page.dart';
 import 'package:shreeram_investment_app/modules/profile/widgets/general_details.dart';
 
@@ -48,11 +50,11 @@ class ProfileController extends GetxController {
   }
 
   void openBankDetails() {
-    Get.snackbar('Navigation', 'Opening Bond Bank Details...');
+    Get.to(() => BankInfoPage());
   }
 
   void openSecurity() {
-    Get.snackbar('Navigation', 'Opening Security Settings...');
+    Get.offAll(() => LoginScreen());
   }
 
   void openAbout() {
