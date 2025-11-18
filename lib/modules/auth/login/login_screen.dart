@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:shreeram_investment_app/modules/auth/login/controller/login_controller.dart';
 import 'package:shreeram_investment_app/modules/auth/otp/opt_verification_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -12,6 +13,9 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
+
+  final LoginController loginController = Get.put(LoginController());
+  
   final TextEditingController _phoneController = TextEditingController();
   String completePhoneNumber = '';
 
@@ -91,54 +95,37 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(
                 width: double.infinity,
                 height: 55,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      if (completePhoneNumber.isEmpty ||
-                          completePhoneNumber.length < 10) {
-                        // 🔴 Show alert if number invalid
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Please enter a valid phone number'),
-                            backgroundColor: Colors.redAccent,
-                          ),
-                        );
-                      } else {
-                        // ✅ Navigate if valid
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('OTP sent successfully' ,  style: TextStyle(color: Colors.white),),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-                        Get.to(() => OtpVerificationScreen(receiver: completePhoneNumber, method: 'phone',
-                              
-                            ));
-                      }
-                    }
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Text(
-                        "Get OTP",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      SizedBox(width: 8),
-                      Icon(Icons.arrow_right_alt, color: Colors.black),
-                    ],
-                  ),
-                ),
+                child:ElevatedButton(
+  style: ElevatedButton.styleFrom(
+    backgroundColor: Colors.white,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(10),
+    ),
+  ),
+  onPressed: () {
+    if (_formKey.currentState!.validate()) {
+      loginController.sendOtp(completePhoneNumber);
+    }
+  },
+  child: Obx(() => loginController.isLoading.value
+      ? const CircularProgressIndicator(color: Colors.black)
+      : Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Text(
+              "Get OTP",
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            SizedBox(width: 8),
+            Icon(Icons.arrow_right_alt, color: Colors.black),
+          ],
+        )),
+)
+
               ),
               const SizedBox(height: 20),
             ],

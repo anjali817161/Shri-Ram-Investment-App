@@ -47,6 +47,7 @@ dependencies:
   pdf: ^3.11.3
   open_file: ^3.5.10
   path_provider: ^2.1.5
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:
@@ -63,7 +64,7 @@ dev_dependencies:
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/images/app_icon.png"   # your app icon path
+  image_path: "assets/icon/app_icon.png"   # your app icon path
   adaptive_icon_background: "#000000"      # optional for Android 8+
   adaptive_icon_foreground: "assets/images/app_icon.png"
 

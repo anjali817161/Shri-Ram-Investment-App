@@ -1,0 +1,3 @@
+- [x] Edit lib/main.dart to fix async initialization and controller injection
+- [x] Edit lib/modules/auth/login/controller/login_controller.dart to use SharedPrefs static methods
+- [x] Run flutter analyze to check for errors

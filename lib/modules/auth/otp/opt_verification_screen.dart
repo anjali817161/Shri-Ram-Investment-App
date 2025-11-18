@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:pinput/pinput.dart';
 import 'package:shreeram_investment_app/modules/auth/basic_details/view/basic_details.dart';
 import 'package:shreeram_investment_app/modules/auth/basic_info/view/basic_info.dart';
+import 'package:shreeram_investment_app/modules/auth/login/controller/login_controller.dart';
 import 'package:shreeram_investment_app/modules/auth/mpin/set_mpin_screen.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
@@ -51,8 +52,27 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     super.dispose();
   }
 
-void _verifyOtp() {
-  if (_otpController.text.length == 6) {
+
+void _verifyOtp() async {
+  final LoginController controller = Get.find<LoginController>();
+  final otp = _otpController.text.trim();
+
+  // 1️⃣ Validate OTP length first
+  if (otp.length != 6) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Please enter a valid 6-digit OTP.'),
+        backgroundColor: Colors.redAccent,
+      ),
+    );
+    return;
+  }
+
+  // 2️⃣ Call API to verify OTP
+  bool success = await controller.verifyOtp(otp, widget.receiver);
+
+  // 3️⃣ Based on API response
+  if (success) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('OTP Verified Successfully'),
@@ -60,16 +80,17 @@ void _verifyOtp() {
       ),
     );
 
-    // 🔥 Navigate based on method
+    // 4️⃣ Navigation logic after OTP verification
     if (widget.method == "phone") {
-      // 👉 If Phone OTP Verified 
-      Get.offAll(() => BasicInfoFormPage());  
+      // Phone OTP → Go to Basic Info Form
+      Get.offAll(() => BasicInfoFormPage());
     } else {
-      // 👉 If Email OTP Verified
+      // Email OTP → Go to User Basic Details Page
       Get.off(() => UserBasicDetailsPage());
     }
 
   } else {
+    // ❌ Wrong or expired OTP
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Invalid OTP. Please try again.'),

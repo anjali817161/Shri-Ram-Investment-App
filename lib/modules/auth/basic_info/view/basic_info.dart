@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shreeram_investment_app/modules/auth/basic_info/controller/basic_info_controller.dart';
 import 'package:shreeram_investment_app/modules/auth/otp/opt_verification_screen.dart';
 
 class BasicInfoFormPage extends StatefulWidget {
@@ -12,6 +13,8 @@ class BasicInfoFormPage extends StatefulWidget {
 class _BasicInfoFormPageState extends State<BasicInfoFormPage> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
+
+  final BasicInfoController controller = Get.put(BasicInfoController());
 
   InputDecoration buildInputDecoration(String hint) {
     return InputDecoration(
@@ -29,7 +32,7 @@ class _BasicInfoFormPageState extends State<BasicInfoFormPage> {
         borderRadius: BorderRadius.circular(12),
       ),
       focusedBorder: OutlineInputBorder(
-        borderSide: const BorderSide(color: Colors.white, width: 1.4),
+        borderSide: const BorderSide(color: Colors.white, width: 1.2),
         borderRadius: BorderRadius.circular(12),
       ),
     );
@@ -41,7 +44,8 @@ class _BasicInfoFormPageState extends State<BasicInfoFormPage> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: const Text("Your Details", style: TextStyle(color: Colors.white)),
+        title: const Text("Your Details",
+            style: TextStyle(color: Colors.white)),
       ),
 
       body: Padding(
@@ -49,63 +53,83 @@ class _BasicInfoFormPageState extends State<BasicInfoFormPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            
-            // Name Label
+
             const Text(
               "Name",
               style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
 
-            // Name TextField
             TextField(
               controller: nameController,
               style: const TextStyle(color: Colors.white),
               decoration: buildInputDecoration("Enter your name"),
             ),
-            const SizedBox(height: 25),
+            const SizedBox(height: 20),
 
-            // Email Label
             const Text(
               "Email",
               style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
 
-            // Email TextField
             TextField(
               controller: emailController,
               style: const TextStyle(color: Colors.white),
               keyboardType: TextInputType.emailAddress,
               decoration: buildInputDecoration("Enter your email"),
             ),
-            const SizedBox(height: 35),
+            const SizedBox(height: 30),
 
-            // Submit Button
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+            Obx(() {
+              return SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
+                  onPressed: controller.isLoading.value
+                      ? null
+                      : () async {
+                          if (nameController.text.isEmpty ||
+                              emailController.text.isEmpty) {
+                            Get.snackbar("Error", "All fields are required",
+                                snackPosition: SnackPosition.BOTTOM);
+                            return;
+                          }
+
+                          // CALL API
+                          bool ok = await controller.submitInfo(
+                            nameController.text.trim(),
+                            emailController.text.trim(),
+                          );
+
+                          if (ok) {
+                            Get.to(() => OtpVerificationScreen(
+                                  receiver: emailController.text,
+                                  method: 'email',
+                                ));
+                          }
+                        },
+                  child: controller.isLoading.value
+                      ? const CircularProgressIndicator(
+                          color: Colors.black,
+                        )
+                      : const Text(
+                          "Submit",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
-                onPressed: () {
-                  // TODO: Add submit logic
-                  Get.to(() => OtpVerificationScreen(receiver: emailController.text , method: 'email'));
-                },
-                child: const Text(
-                  "Submit",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            )
+              );
+            }),
           ],
         ),
       ),
