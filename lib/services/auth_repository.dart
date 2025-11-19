@@ -172,7 +172,7 @@ class AuthRepository {
     );
   }
 
-/// 🔹 Create MPIN API Call
+  /// 🔹 Create MPIN API Call
   Future<Map<String, dynamic>> createMpin(String userId, String mpin) async {
     final String token = await SharedPrefs.getToken() ?? "";
 
@@ -197,6 +197,52 @@ class AuthRepository {
     );
 
     print("🔹 MPIN API Response:");
+    print("🔹 Status Code: ${response.statusCode}");
+    print("🔹 Response Body: ${response.body}");
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return jsonDecode(response.body); // success
+    } else {
+      try {
+        final errorData = jsonDecode(response.body);
+        return {
+          "error": true,
+          "message": errorData["message"] ?? errorData["error"] ?? "Something went wrong"
+        };
+      } catch (e) {
+        return {
+          "error": true,
+          "message": "Something went wrong"
+        };
+      }
+    }
+  }
+
+  /// 🔹 Login with MPIN API Call
+  Future<Map<String, dynamic>> loginWithMpin(String userId, String mpin) async {
+    final String token = await SharedPrefs.getToken() ?? "";
+
+    print("🔹 Constructing MPIN Login API URL: ${ApiEndpoints.baseUrl}${ApiEndpoints.loginWithMpin}");
+    final uri = Uri.parse("${ApiEndpoints.baseUrl}${ApiEndpoints.loginWithMpin}");
+
+    print("🔹 MPIN Login API Request:");
+    print("🔹 URL: $uri");
+    print("🔹 Headers: Content-Type: application/json, Authorization: Bearer ${token != null ? 'Present' : 'Null'}");
+    print("🔹 Body: {userId: $userId, mpin: $mpin}");
+
+    final response = await http.post(
+      uri,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token",
+      },
+      body: jsonEncode({
+        "userId": userId,
+        "mpin": mpin,
+      }),
+    );
+
+    print("🔹 MPIN Login API Response:");
     print("🔹 Status Code: ${response.statusCode}");
     print("🔹 Response Body: ${response.body}");
 

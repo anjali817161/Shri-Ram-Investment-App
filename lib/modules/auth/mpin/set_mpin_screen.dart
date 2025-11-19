@@ -6,7 +6,9 @@ import 'package:shreeram_investment_app/modules/auth/mpin/set_mpin_controller.da
 import 'package:shreeram_investment_app/modules/home/view/home_view.dart' as home_view;
 
 class SetMpinScreen extends StatefulWidget {
-  const SetMpinScreen({super.key});
+  final bool isVerificationMode;
+
+  const SetMpinScreen({super.key, this.isVerificationMode = false});
 
   @override
   State<SetMpinScreen> createState() => _SetMpinScreenState();
@@ -25,38 +27,55 @@ class _SetMpinScreenState extends State<SetMpinScreen> {
  void _proceed() {
   FocusScope.of(context).unfocus();
 
-  if (!_isTermsAccepted) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Please accept Terms & Conditions to proceed'),
-        backgroundColor: Colors.redAccent,
-      ),
-    );
-    return;
-  }
+  if (!widget.isVerificationMode) {
+    // Creation mode validations
+    if (!_isTermsAccepted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please accept Terms & Conditions to proceed'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
 
-  if (_mpinController.text.length != 6 ||
-      _confirmMpinController.text.length != 6) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Please enter a valid 6-digit PIN'),
-        backgroundColor: Colors.redAccent,
-      ),
-    );
-    return;
-  }
+    if (_mpinController.text.length != 6 ||
+        _confirmMpinController.text.length != 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a valid 6-digit PIN'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
 
-  if (_mpinController.text != _confirmMpinController.text) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('PINs do not match. Please try again.'),
-        backgroundColor: Colors.redAccent,
-      ),
-    );
-    return;
-  }
+    if (_mpinController.text != _confirmMpinController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('PINs do not match. Please try again.'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
 
-  controller.createMpin(_mpinController.text);
+    controller.createMpin(_mpinController.text);
+  } else {
+    // Verification mode - just validate PIN length
+    if (_mpinController.text.length != 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a valid 6-digit PIN'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
+    // Call MPIN verification logic
+    controller.loginWithMpin(_mpinController.text);
+  }
 }
 
 
@@ -101,8 +120,8 @@ class _SetMpinScreenState extends State<SetMpinScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Create your secure PIN",
+              Text(
+                widget.isVerificationMode ? "Enter your PIN" : "Create your secure PIN",
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 26,
@@ -110,8 +129,10 @@ class _SetMpinScreenState extends State<SetMpinScreen> {
                 ),
               ),
               const SizedBox(height: 10),
-              const Text(
-                "This will allow you (and only you) to access your investments",
+              Text(
+                widget.isVerificationMode
+                    ? "Enter your MPIN to access your account"
+                    : "This will allow you (and only you) to access your investments",
                 style: TextStyle(
                   color: Colors.grey,
                   fontSize: 15,
@@ -119,127 +140,174 @@ class _SetMpinScreenState extends State<SetMpinScreen> {
               ),
               const SizedBox(height: 50),
 
-              // ✅ Set MPIN
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "Set PIN",
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+              // ✅ MPIN Input (Single field for verification, or Set/Confirm for creation)
+              ...[
+                if (widget.isVerificationMode) ...[
+                  // Single PIN field for verification
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "Enter PIN",
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _isMpinVisible = !_isMpinVisible;
+                          });
+                        },
+                        icon: Icon(
+                          _isMpinVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Center(
+                    child: Pinput(
+                      controller: _mpinController,
+                      length: 6,
+                      obscureText: !_isMpinVisible,
+                      keyboardType: TextInputType.number,
+                      defaultPinTheme: pinTheme,
+                      focusedPinTheme: focusedPinTheme,
                     ),
                   ),
-                  IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _isMpinVisible = !_isMpinVisible;
-                      });
-                    },
-                    icon: Icon(
-                      _isMpinVisible
-                          ? Icons.visibility
-                          : Icons.visibility_off,
-                      color: Colors.white70,
+                ] else ...[
+                  // Set and Confirm PIN fields for creation
+                  // ✅ Set MPIN
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "Set PIN",
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _isMpinVisible = !_isMpinVisible;
+                          });
+                        },
+                        icon: Icon(
+                          _isMpinVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Center(
+                    child: Pinput(
+                      controller: _mpinController,
+                      length: 6,
+                      obscureText: !_isMpinVisible,
+                      keyboardType: TextInputType.number,
+                      defaultPinTheme: pinTheme,
+                      focusedPinTheme: focusedPinTheme,
                     ),
                   ),
-                ],
-              ),
-              Center(
-                child: Pinput(
-                  controller: _mpinController,
-                  length: 6,
-                  obscureText: !_isMpinVisible,
-                  keyboardType: TextInputType.number,
-                  defaultPinTheme: pinTheme,
-                  focusedPinTheme: focusedPinTheme,
-                ),
-              ),
 
-              const SizedBox(height: 35),
+                  const SizedBox(height: 35),
 
-              // ✅ Confirm MPIN
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "Confirm PIN",
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                  // ✅ Confirm MPIN
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "Confirm PIN",
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _isConfirmMpinVisible = !_isConfirmMpinVisible;
+                          });
+                        },
+                        icon: Icon(
+                          _isConfirmMpinVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Center(
+                    child: Pinput(
+                      controller: _confirmMpinController,
+                      length: 6,
+                      obscureText: !_isConfirmMpinVisible,
+                      keyboardType: TextInputType.number,
+                      defaultPinTheme: pinTheme,
+                      focusedPinTheme: focusedPinTheme,
                     ),
                   ),
-                  IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _isConfirmMpinVisible = !_isConfirmMpinVisible;
-                      });
-                    },
-                    icon: Icon(
-                      _isConfirmMpinVisible
-                          ? Icons.visibility
-                          : Icons.visibility_off,
-                      color: Colors.white70,
-                    ),
-                  ),
-                ],
-              ),
-              Center(
-                child: Pinput(
-                  controller: _confirmMpinController,
-                  length: 6,
-                  obscureText: !_isConfirmMpinVisible,
-                  keyboardType: TextInputType.number,
-                  defaultPinTheme: pinTheme,
-                  focusedPinTheme: focusedPinTheme,
-                ),
-              ),
+                ]
+              ],
 
               const SizedBox(height: 40),
 
-              // ✅ Terms Checkbox
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Checkbox(
-                    value: _isTermsAccepted,
-                    onChanged: (value) {
-                      setState(() {
-                        _isTermsAccepted = value ?? false;
-                      });
-                    },
-                    activeColor: Colors.white,
-                    checkColor: Colors.black,
-                  ),
-                  Expanded(
-                    child: Text.rich(
-                      TextSpan(
-                        text: "I have read and agree to the ",
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: "Terms & Conditions",
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w500,
-                              decoration: TextDecoration.underline,
-                            ),
-                            // Add link tap if needed
-                            // recognizer: TapGestureRecognizer()..onTap = () {}
+              // ✅ Terms Checkbox (only show in creation mode)
+              if (!widget.isVerificationMode) ...[
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Checkbox(
+                      value: _isTermsAccepted,
+                      onChanged: (value) {
+                        setState(() {
+                          _isTermsAccepted = value ?? false;
+                        });
+                      },
+                      activeColor: Colors.white,
+                      checkColor: Colors.black,
+                    ),
+                    Expanded(
+                      child: Text.rich(
+                        TextSpan(
+                          text: "I have read and agree to the ",
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 14,
                           ),
-                        ],
+                          children: [
+                            TextSpan(
+                              text: "Terms & Conditions",
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                                decoration: TextDecoration.underline,
+                              ),
+                              // Add link tap if needed
+                              // recognizer: TapGestureRecognizer()..onTap = () {}
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 140),
+                  ],
+                ),
+                const SizedBox(height: 140),
+              ] else ...[
+                const SizedBox(height: 200),
+              ],
 
               // ✅ Proceed button
               SizedBox(
@@ -254,8 +322,8 @@ class _SetMpinScreenState extends State<SetMpinScreen> {
                   ),
                   onPressed: _proceed,
                   icon: const Icon(Icons.lock_outline, color: Colors.black),
-                  label: const Text(
-                    "Proceed",
+                  label: Text(
+                    widget.isVerificationMode ? "Verify PIN" : "Proceed",
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 17,

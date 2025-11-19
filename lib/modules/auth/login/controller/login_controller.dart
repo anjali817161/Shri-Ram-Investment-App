@@ -50,7 +50,7 @@ class LoginController extends GetxController {
 
   //verify otp
   
-Future<bool> verifyOtp(String otp, String receiver, String method) async {
+Future<Map<String, dynamic>> verifyOtp(String otp, String receiver, String method) async {
   try {
     isLoading.value = true;
 
@@ -60,8 +60,8 @@ Future<bool> verifyOtp(String otp, String receiver, String method) async {
 
     final res = method == "phone"
         ? await _authRepository.verifyMobileOtp(receiver, otp)
-        : await _authRepository.verifyEmailOtp(otp, userId! ); 
-        
+        : await _authRepository.verifyEmailOtp(otp, userId! );
+
 
     final status = res["statusCode"];
     final body = res["data"];
@@ -71,7 +71,7 @@ Future<bool> verifyOtp(String otp, String receiver, String method) async {
     if(userId == null && method == "email") {
       Get.snackbar("Error", "User ID not found. Please login again.",
           snackPosition: SnackPosition.BOTTOM);
-      return false;
+      return {"success": false, "isRegistered": false};
     }
 
     // 1️⃣ Check status code
@@ -90,14 +90,14 @@ Future<bool> verifyOtp(String otp, String receiver, String method) async {
         Get.snackbar("Success", "OTP Verified!",
             snackPosition: SnackPosition.BOTTOM);
 
-        return true;
+        return {"success": true, "isRegistered": isRegistered};
       }
     }
 
     // Wrong OTP / expired OTP
     Get.snackbar("Error", body["message"] ?? "Invalid OTP",
         snackPosition: SnackPosition.BOTTOM);
-    return false;
+    return {"success": false, "isRegistered": false};
 
   } catch (e) {
     print("Exception in verifyOtp: $e");
@@ -105,7 +105,7 @@ Future<bool> verifyOtp(String otp, String receiver, String method) async {
     Get.snackbar("Error", "Something went wrong",
         snackPosition: SnackPosition.BOTTOM);
 
-    return false;
+    return {"success": false, "isRegistered": false};
   } finally {
     isLoading.value = false;
   }

@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:shreeram_investment_app/modules/home/model/home_model.dart';
-
 
 class HomeController extends GetxController {
   var bonds = <Bond>[].obs;
@@ -20,9 +20,12 @@ class HomeController extends GetxController {
   }
 
   void loadBonds() {
+    // 🔥 Dynamic date generate
+    String today = DateFormat("dd MMM yyyy").format(DateTime.now());
+
     bonds.value = [
       Bond(
-        name: "Shri Ram Investment - 17 Nov 2025",
+        name: "Shri Ram Investment - $today", 
         rate: 12,
         maturity: "0-24 months",
         minInvestment: 500000,

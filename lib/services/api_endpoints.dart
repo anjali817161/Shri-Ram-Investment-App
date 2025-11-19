@@ -13,6 +13,7 @@ class ApiEndpoints {
   static const String emailOtpVerify = "verify-email-otp";
   static const String baiscDetails = "details";
   static const String createMpin = "create-mpin";
+  static const String loginWithMpin = "login-with-mpin";
 
   // ============================================================
   // 👤 USER PROFILE

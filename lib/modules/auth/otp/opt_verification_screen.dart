@@ -69,7 +69,9 @@ void _verifyOtp() async {
   }
 
   // 2️⃣ Call API to verify OTP based on method
-  bool success = await controller.verifyOtp(otp, widget.receiver, widget.method);
+  Map<String, dynamic> result = await controller.verifyOtp(otp, widget.receiver, widget.method);
+  bool success = result["success"];
+  bool isRegistered = result["isRegistered"];
 
   // 3️⃣ Based on API response
   if (success) {
@@ -82,8 +84,14 @@ void _verifyOtp() async {
 
     // 4️⃣ Navigation logic after OTP verification
     if (widget.method == "phone") {
-      // Phone OTP → Go to Basic Info Form
-      Get.offAll(() => BasicInfoFormPage());
+      // Phone OTP → Check if registered
+      if (isRegistered) {
+        // User is already registered → Go to MPIN verification
+        Get.offAll(() => SetMpinScreen(isVerificationMode: true));
+      } else {
+        // New user → Go to Basic Info Form
+        Get.offAll(() => BasicInfoFormPage());
+      }
     } else {
       // Email OTP → Go to User Basic Details Page
       Get.off(() => SetMpinScreen());
