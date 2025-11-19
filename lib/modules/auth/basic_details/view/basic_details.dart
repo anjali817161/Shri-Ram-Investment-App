@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/state_manager.dart';
+import 'package:shreeram_investment_app/modules/auth/basic_details/controller/basic_details_Controller.dart';
 import 'package:shreeram_investment_app/modules/auth/mpin/set_mpin_screen.dart';
+import 'package:shreeram_investment_app/modules/home/view/home_view.dart';
 
 class UserBasicDetailsPage extends StatefulWidget {
   const UserBasicDetailsPage({super.key});
@@ -20,6 +22,7 @@ class _UserBasicDetailsPageState extends State<UserBasicDetailsPage> {
   bool acceptDeclaration = false;
 
   final TextEditingController parentController = TextEditingController();
+  final controller = Get.put(BasicDetailsController());
 
   // Reusable list of chips
   Widget buildOptionChip(String label, String? selectedValue, Function(String) onSelect) {
@@ -187,9 +190,32 @@ class _UserBasicDetailsPageState extends State<UserBasicDetailsPage> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                 ),
-                onPressed: () {
-                  Get.to(() => SetMpinScreen());
-                },
+                onPressed: () async {
+
+  if (selectedMarital == null ||
+      selectedOccupation == null ||
+      selectedIncome == null ||
+      selectedExperience == null ||
+      parentController.text.isEmpty ||
+      acceptDeclaration == false) {
+    Get.snackbar("Error", "Please fill all fields");
+    return;
+  }
+
+  bool success = await controller.submitBasicDetails(
+    maritalStatus: selectedMarital!,
+    occupation: selectedOccupation!,
+    annualIncome: selectedIncome!,
+    investmentExperience: selectedExperience!,
+    parentName: parentController.text.trim(),
+    declarationsAccepted: acceptDeclaration,
+  );
+
+  if (success) {
+    Get.to(() => InvestmentHomeScreen());
+  }
+},
+
                 child: const Text(
                   "Submit",
                   style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),

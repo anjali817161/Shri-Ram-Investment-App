@@ -50,18 +50,29 @@ class LoginController extends GetxController {
 
   //verify otp
   
-Future<bool> verifyOtp(String otp, String phone) async {
+Future<bool> verifyOtp(String otp, String receiver, String method) async {
   try {
     isLoading.value = true;
 
-    print("Verifying OTP → Phone: ${phoneNumber.value}, OTP: $otp");
+    final userId = await SharedPrefs.getUserId();
 
-    final res = await _authRepository.verifyMobileOtp(phone, otp);
+    print("Verifying OTP → $method: $receiver, OTP: $otp");
+
+    final res = method == "phone"
+        ? await _authRepository.verifyMobileOtp(receiver, otp)
+        : await _authRepository.verifyEmailOtp(otp, userId! ); 
+        
 
     final status = res["statusCode"];
     final body = res["data"];
 
     print("API Response → $body");
+
+    if(userId == null && method == "email") {
+      Get.snackbar("Error", "User ID not found. Please login again.",
+          snackPosition: SnackPosition.BOTTOM);
+      return false;
+    }
 
     // 1️⃣ Check status code
     if (status == 200) {
@@ -78,9 +89,6 @@ Future<bool> verifyOtp(String otp, String phone) async {
 
         Get.snackbar("Success", "OTP Verified!",
             snackPosition: SnackPosition.BOTTOM);
-
-        // Navigate
-        Get.offAll(() => BasicInfoFormPage());
 
         return true;
       }

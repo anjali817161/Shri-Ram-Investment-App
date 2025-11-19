@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pinput/pinput.dart';
+import 'package:shreeram_investment_app/modules/auth/basic_details/view/basic_details.dart';
+import 'package:shreeram_investment_app/modules/auth/mpin/set_mpin_controller.dart';
 import 'package:shreeram_investment_app/modules/home/view/home_view.dart' as home_view;
 
 class SetMpinScreen extends StatefulWidget {
@@ -14,53 +16,49 @@ class _SetMpinScreenState extends State<SetMpinScreen> {
   final TextEditingController _mpinController = TextEditingController();
   final TextEditingController _confirmMpinController = TextEditingController();
 
+  final MpinController controller = Get.put(MpinController());  
+
   bool _isMpinVisible = false;
   bool _isConfirmMpinVisible = false;
   bool _isTermsAccepted = false;
 
-  void _proceed() {
-    FocusScope.of(context).unfocus();
+ void _proceed() {
+  FocusScope.of(context).unfocus();
 
-    if (!_isTermsAccepted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please accept Terms & Conditions to proceed'),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
-      return;
-    }
-
-    if (_mpinController.text.length != 6 ||
-        _confirmMpinController.text.length != 6) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter a valid 6-digit PIN'),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
-      return;
-    }
-
-    if (_mpinController.text != _confirmMpinController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('PINs do not match. Please try again.'),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
-      return;
-    }
-
+  if (!_isTermsAccepted) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('PIN set successfully'),
-        backgroundColor: Colors.green,
+        content: Text('Please accept Terms & Conditions to proceed'),
+        backgroundColor: Colors.redAccent,
       ),
     );
-
-    Get.offAll(() =>  home_view.InvestmentHomeScreen());
+    return;
   }
+
+  if (_mpinController.text.length != 6 ||
+      _confirmMpinController.text.length != 6) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Please enter a valid 6-digit PIN'),
+        backgroundColor: Colors.redAccent,
+      ),
+    );
+    return;
+  }
+
+  if (_mpinController.text != _confirmMpinController.text) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('PINs do not match. Please try again.'),
+        backgroundColor: Colors.redAccent,
+      ),
+    );
+    return;
+  }
+
+  controller.createMpin(_mpinController.text);
+}
+
 
   @override
   Widget build(BuildContext context) {

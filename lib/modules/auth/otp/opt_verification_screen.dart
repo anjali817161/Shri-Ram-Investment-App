@@ -68,8 +68,8 @@ void _verifyOtp() async {
     return;
   }
 
-  // 2️⃣ Call API to verify OTP
-  bool success = await controller.verifyOtp(otp, widget.receiver);
+  // 2️⃣ Call API to verify OTP based on method
+  bool success = await controller.verifyOtp(otp, widget.receiver, widget.method);
 
   // 3️⃣ Based on API response
   if (success) {
@@ -86,7 +86,7 @@ void _verifyOtp() async {
       Get.offAll(() => BasicInfoFormPage());
     } else {
       // Email OTP → Go to User Basic Details Page
-      Get.off(() => UserBasicDetailsPage());
+      Get.off(() => SetMpinScreen());
     }
 
   } else {
@@ -102,13 +102,15 @@ void _verifyOtp() async {
 
 
   void _resendOtp() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-            'OTP resent to your ${widget.method == "phone" ? "mobile" : "email"}'),
-        backgroundColor: Colors.green,
-      ),
-    );
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              'OTP resent to your ${widget.method == "phone" ? "mobile" : "email"}'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
     _startTimer();
   }
 

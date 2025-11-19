@@ -10,7 +10,9 @@ class ApiEndpoints {
   static const String login = "send-mobile-otp";
   static const String verifyMobileOtp = "verify-mobile-otp";
   static const String submitUserDetails = "submit-user-details";
-  static const String otpVerify = "$baseUrl/verify-otp";
+  static const String emailOtpVerify = "verify-email-otp";
+  static const String baiscDetails = "details";
+  static const String createMpin = "create-mpin";
 
   // ============================================================
   // 👤 USER PROFILE

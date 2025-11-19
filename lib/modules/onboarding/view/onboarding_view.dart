@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shreeram_investment_app/modules/auth/basic_details/view/basic_details.dart';
 import 'package:shreeram_investment_app/modules/auth/login/login_screen.dart';
+import 'package:shreeram_investment_app/modules/auth/mpin/set_mpin_screen.dart';
 import 'package:shreeram_investment_app/modules/home/view/home_view.dart';
 import 'package:shreeram_investment_app/modules/onboarding/controller/onboarding_controller.dart';
 
@@ -115,6 +117,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                 onPressed: () {
                   Get.to(() => LoginScreen());
                   //  Get.offAll(() => InvestmentHomeScreen());
+                
                 },
                 child: const Text(
                   'Get Started',
