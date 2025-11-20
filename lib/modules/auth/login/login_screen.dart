@@ -18,6 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   
   final TextEditingController _phoneController = TextEditingController();
   String completePhoneNumber = '';
+  String numberOnly = '';
 
   @override
   Widget build(BuildContext context) {
@@ -81,6 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 initialCountryCode: 'IN',
                 onChanged: (phone) {
                   completePhoneNumber = phone.completeNumber;
+                  numberOnly = phone.number;
                 },
                 validator: (phone) {
                   if (phone == null || phone.number.isEmpty) {
@@ -104,7 +106,7 @@ class _LoginScreenState extends State<LoginScreen> {
   ),
   onPressed: () {
     if (_formKey.currentState!.validate()) {
-      loginController.sendOtp(completePhoneNumber);
+      loginController.sendOtp(numberOnly);
     }
   },
   child: Obx(() => loginController.isLoading.value

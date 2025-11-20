@@ -2,15 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shreeram_investment_app/modules/bankdetails/view/bank_details.dart';
 import 'package:shreeram_investment_app/modules/home/view/home_view.dart';
+import 'package:shreeram_investment_app/modules/profile/widgets/general_details.dart';
 import '../controller/profile_controller.dart';
 
-class ProfilePage extends StatelessWidget {
-  final ProfileController controller = Get.put(ProfileController());
+class ProfilePage extends StatefulWidget {
 
   ProfilePage({super.key});
 
   @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  final ProfileController controller = Get.put(ProfileController());
+
+  
+@override
+  void initState() {
+    super.initState();
+    controller.fetchProfile();
+  }
+
+  @override
   Widget build(BuildContext context) {
+
+
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -53,12 +70,15 @@ class ProfilePage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                Expanded(
+
+                Obx((){
+                 
+                   return  Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children:  [
                       Text(
-                        "Anjali chaudhary",
+                        controller.user.value?.name ?? "Account Holder",
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 18,
@@ -67,12 +87,14 @@ class ProfilePage extends StatelessWidget {
                       ),
                       SizedBox(height: 4),
                       Text(
-                        "User since 11 Nov 2025",
+                        "Account Details",
                         style: TextStyle(color: Colors.grey, fontSize: 13),
                       ),
                     ],
                   ),
-                ),
+                );
+                }),
+               
                 GestureDetector(
                   onTap: (){
                     Get.to(() => BankDetailsPage());
@@ -147,17 +169,19 @@ class ProfilePage extends StatelessWidget {
             _buildMenuItem(
               icon: Icons.person_outline,
               title: "General details",
-              onTap: controller.openGeneralDetails,
+              onTap: (){
+                Get.to(() => GeneralDetailsPage());
+              },
             ),
             _buildMenuItem(
               icon: Icons.account_balance_outlined,
               title: "Bank details",
-              onTap: controller.openBankDetails,
+              onTap:(){},
             ),
             _buildMenuItem(
               icon: Icons.file_download_outlined,
               title: "Reports & documents",
-              onTap: controller.openReports,
+              onTap: (){},
             ),
             // _buildMenuItem(
             //   icon: Icons.account_balance_outlined,
@@ -168,7 +192,7 @@ class ProfilePage extends StatelessWidget {
             _buildMenuItem(
               icon: Icons.logout_outlined,
               title: "Logout",
-              onTap: controller.openSecurity,
+              onTap: (){},
             ),
            
           ],

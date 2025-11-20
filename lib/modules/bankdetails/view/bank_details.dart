@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shreeram_investment_app/modules/bankdetails/view/capture_image.dart';
 
 class BankDetailsPage extends StatefulWidget {
@@ -14,16 +15,64 @@ class _BankDetailsPageState extends State<BankDetailsPage> {
   final TextEditingController _ifscController = TextEditingController();
   final TextEditingController _accountController = TextEditingController();
 
-  void _submitForm() {
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedBankDetails();
+  }
+
+  /// ✅ Fetch saved bank details from local storage
+  Future<void> _loadSavedBankDetails() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _ifscController.text = prefs.getString("ifsc") ?? "";
+    _accountController.text = prefs.getString("accountNumber") ?? "";
+    setState(() {});
+  }
+
+  /// ✅ Save bank details locally
+  Future<void> _saveBankDetails() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String ifsc = _ifscController.text.trim();
+    String accountNumber = _accountController.text.trim();
+
+    await prefs.setString("ifsc", ifsc);
+    await prefs.setString("accountNumber", accountNumber);
+
+    // Debugging prints
+    print("Bank details saved to local storage:");
+    print("IFSC: $ifsc");
+    print("Account Number: $accountNumber");
+
+    // Verify by retrieving
+    String? savedIfsc = prefs.getString("ifsc");
+    String? savedAccount = prefs.getString("accountNumber");
+    print("Verification - Saved IFSC: $savedIfsc");
+    print("Verification - Saved Account: $savedAccount");
+  }
+
+  /// Submit Form
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
+      print("Form validated. Proceeding to save bank details.");
+      await _saveBankDetails();
+      print("Bank details saved. Clearing fields and showing success snackbar.");
+
+      // Clear the fields
+      _ifscController.clear();
+      _accountController.clear();
+
       Get.snackbar(
         'Success',
-        'Bank details submitted successfully!',
+        'Bank details saved successfully!',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.green.shade600,
         colorText: Colors.white,
       );
-      Get.to(() => CaptureImagePage());
+
+      print("Navigating to CaptureImagePage.");
+      Get.to(() => const CaptureImagePage());
+    } else {
+      print("Form validation failed.");
     }
   }
 
@@ -59,14 +108,12 @@ class _BankDetailsPageState extends State<BankDetailsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Instruction text
               const Text(
                 "Please ensure the bank account belongs to you.\nInvestments can only be made with this account.",
                 style: TextStyle(color: Colors.grey, fontSize: 14, height: 1.4),
               ),
               const SizedBox(height: 24),
 
-              // Section heading
               const Text(
                 "ENTER BANK DETAILS",
                 style: TextStyle(
@@ -77,7 +124,7 @@ class _BankDetailsPageState extends State<BankDetailsPage> {
               ),
               const SizedBox(height: 10),
 
-              // IFSC field
+              /// IFSC Field
               TextFormField(
                 controller: _ifscController,
                 style: const TextStyle(color: Colors.white),
@@ -89,24 +136,24 @@ class _BankDetailsPageState extends State<BankDetailsPage> {
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey.shade800),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.green),
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.green),
                   ),
                 ),
                 textCapitalization: TextCapitalization.characters,
-                // validator: (value) {
-                //   if (value == null || value.isEmpty) {
-                //     return "Please enter IFSC code";
-                //   }
-                //   if (!RegExp(r"^[A-Z]{4}0[A-Z0-9]{6}$").hasMatch(value)) {
-                //     return "Enter valid IFSC code";
-                //   }
-                //   return null;
-                // },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Please enter IFSC code";
+                  }
+                  if (!RegExp(r"^[A-Z]{4}0[A-Z0-9]{6}$").hasMatch(value)) {
+                    return "Enter valid IFSC (e.g. SBIN0005943)";
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 16),
 
-              // Account number field
+              /// Account Number Field
               TextFormField(
                 controller: _accountController,
                 style: const TextStyle(color: Colors.white),
@@ -118,8 +165,8 @@ class _BankDetailsPageState extends State<BankDetailsPage> {
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey.shade800),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.green),
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.green),
                   ),
                 ),
                 keyboardType: TextInputType.number,
@@ -127,8 +174,8 @@ class _BankDetailsPageState extends State<BankDetailsPage> {
                   if (value == null || value.isEmpty) {
                     return "Please enter account number";
                   }
-                  if (value.length < 9 || value.length > 18) {
-                    return "Enter valid account number";
+                  if (!RegExp(r"^[0-9]{9,18}$").hasMatch(value)) {
+                    return "Enter valid account number (9 to 18 digits)";
                   }
                   return null;
                 },
@@ -136,23 +183,21 @@ class _BankDetailsPageState extends State<BankDetailsPage> {
 
               const SizedBox(height: 20),
 
-              // Info text
               Container(
-                width: double.infinity,
                 padding: const EdgeInsets.all(12),
+                width: double.infinity,
                 decoration: BoxDecoration(
                   color: Colors.grey.shade900,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: const Text(
                   "To verify your account, please transfer ₹1.\nWe will refund within 48 hours.",
-                  style: TextStyle(color: Colors.grey, fontSize: 13, height: 1.4),
+                  style: TextStyle(color: Colors.grey, fontSize: 13),
                 ),
               ),
 
               const Spacer(),
 
-              // Submit button
               SizedBox(
                 width: double.infinity,
                 height: 48,

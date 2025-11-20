@@ -18,9 +18,9 @@ class ApiEndpoints {
   // ============================================================
   // 👤 USER PROFILE
   // ============================================================
-  static const String profile = "$baseUrl/profile";
-  static const String updateProfile = "$baseUrl/update-profile";
-  static const String uploadProfileImage = "$baseUrl/upload-profile-image";
+  static const String profile = "me";
+  static const String updateProfile = "update";
+  static const String uploadProfileImage = "upload-profile-image";
 
   
 }

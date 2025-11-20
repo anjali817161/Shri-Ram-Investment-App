@@ -6,10 +6,12 @@ import 'package:get/get.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:shreeram_investment_app/modules/kyc/widgest/dasshed_border.dart';
 import 'package:shreeram_investment_app/modules/nominee/view/add_nominee.dart';
+import 'package:shreeram_investment_app/modules/profile/controller/profile_controller.dart';
 import '../controller/kyc_controller.dart';
 
 class KycUploadScreen extends StatelessWidget {
   final KycController controller = Get.put(KycController());
+  final ProfileController profileController = Get.find<ProfileController>();
 
   @override
   Widget build(BuildContext context) {
@@ -72,20 +74,11 @@ class KycUploadScreen extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                  if (controller.adharFront.value == null ||
-                      controller.adharBack.value == null ||
-                      controller.panCard.value == null) {
-                    Get.snackbar("Missing Documents",
-                        "Please upload all required KYC documents.",
-                        colorText: Colors.white,
-                        backgroundColor: Colors.redAccent);
-                  } else {
-                    Get.snackbar("Success", "KYC submitted successfully!",
-                        colorText: Colors.white,
-                        backgroundColor: Colors.green);
-                  }
-                  Get.to(() => AddNomineeScreen());
+                  final user = profileController.user.value;
+  controller.submitKyc( user?.id ?? "");
                 },
+
+
                 child: const Text(
                   "Submit Documents",
                   style: TextStyle(

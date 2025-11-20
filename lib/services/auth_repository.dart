@@ -1,5 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:get/get_connect/http/src/multipart/form_data.dart';
+import 'package:get/get_connect/http/src/multipart/multipart_file.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shreeram_investment_app/services/api_endpoints.dart';
 import 'package:shreeram_investment_app/services/sharedPreferences.dart';
 
@@ -263,4 +267,91 @@ class AuthRepository {
       }
     }
   }
+
+
+  Future<http.Response> fetchUserProfile() async{
+    final token = await SharedPrefs.getToken()
+;
+final url = Uri.parse("${ApiEndpoints.baseUrl}${ApiEndpoints.profile}");
+return await http.get(url,
+headers: {
+"Authorization":" Bearer $token",
+"Content-Type": "application/json"
+});
+
+  }
+
+
+  Future<http.Response> updateProfile(Map<String, dynamic> body) async {
+  final url = Uri.parse("${ApiEndpoints.baseUrl}${ApiEndpoints.updateProfile}");
+
+  try {
+    final response = await http.put(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer ${await SharedPrefs.getToken()}",
+      },
+      body: jsonEncode(body),
+    );
+
+    return response;
+  } catch (e) {
+    throw Exception("Update API failed: $e");
+  }
+}
+
+
+Future<http.StreamedResponse> uploadKycDocuments({
+  required String userId,
+  required File aadhaarFront,
+  required File aadhaarBack,
+  required File panCard,
+}) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? token = prefs.getString("token");
+
+  final url = Uri.parse(
+      "https://shriraminvestment-app.onrender.com/api/bankkyc/$userId/documents");
+
+  print("Uploading to: $url");
+  print("Token: $token");
+
+  // Correct multipart request
+  var request = http.MultipartRequest("POST", url);
+
+  request.headers.addAll({
+    "Authorization": "Bearer $token",
+    // DO NOT SET Content-Type, MultipartRequest will set it automatically
+  });
+
+  // Attach files
+  request.files.add(
+    await http.MultipartFile.fromPath("aadhaarFront", aadhaarFront.path),
+  );
+
+  request.files.add(
+    await http.MultipartFile.fromPath("aadhaarBack", aadhaarBack.path),
+  );
+
+  request.files.add(
+    await http.MultipartFile.fromPath("panCard", panCard.path),
+  );
+
+  print("Files added. Sending request…");
+
+  // Send request
+  final response = await request.send();
+
+  print("Status Code: ${response.statusCode}");
+
+  // Convert response stream to string body for debugging
+  final respStr = await response.stream.bytesToString();
+  print("Response Body: $respStr");
+
+  return response;
+}
+
+
+
 }
