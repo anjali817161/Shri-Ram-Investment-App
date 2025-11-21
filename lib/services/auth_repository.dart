@@ -302,6 +302,49 @@ headers: {
 }
 
 
+// 🔹 Submit User Basic Details
+Future<Map<String, dynamic>> submitBankDetails(
+    String accountNumber, String ifscCode) async {
+
+  final url = Uri.parse("https://shriraminvestment-app.onrender.com/api/bankkyc/ukyc");
+
+  final token = await SharedPrefs.getToken() ?? "";
+  final userId = await SharedPrefs.getUserId() ?? "";
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token",
+      },
+      body: jsonEncode({
+        "userId": userId,
+        "accountNumber": accountNumber,
+        "ifscCode": ifscCode
+      }),
+    );
+
+
+      final data = jsonDecode(response.body);
+
+      print("👉 BANK DETAIL STATUS: ${response.statusCode}");
+      print("👉 BANK RESPONSE: $data");
+
+      return {
+        "status": response.statusCode,
+        "data": data,
+      };
+
+    } catch (e) {
+      return {
+        "status": 500,
+        "data": {"message": "Network Error: $e"},
+      };
+    }
+  }
+
+
 Future<http.StreamedResponse> uploadKycDocuments({
   required String userId,
   required File aadhaarFront,
@@ -352,6 +395,58 @@ Future<http.StreamedResponse> uploadKycDocuments({
   return response;
 }
 
+//submit nominee details
+
+ Future<Map<String, dynamic>> submitNomineeDetails({
+  required String userId,
+  required String nomineeName,
+  required String relation,
+  required String dob,
+  required String proofType,
+  required String proofDigits,
+  required bool addressSame,
+}) async {
+  final url = Uri.parse(
+      "https://shriraminvestment-app.onrender.com/api/bankkyc/addnominee");
+
+  final token = await SharedPrefs.getToken() ?? "";
+
+  final body = jsonEncode({
+    "user_id": userId,                // ✅ FIXED
+    "nomineeName": nomineeName,
+    "relation": relation,
+    "dateOfBirth": dob,
+    "proofType": proofType,
+    "proofLast4Digits": proofDigits,
+    "addressSame": addressSame,
+  });
+
+  print("👉 FINAL BODY SENT: $body");
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      body: body,
+    );
+
+    print("👉 STATUS: ${response.statusCode}");
+    print("👉 RESPONSE: ${response.body}");
+
+    return {
+      "status": response.statusCode,
+      "data": jsonDecode(response.body),
+    };
+  } catch (e) {
+    return {
+      "status": 500,
+      "data": {"message": "Network Error: $e"},
+    };
+  }
+}
 
 
 }

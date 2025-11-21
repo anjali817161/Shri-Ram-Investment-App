@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shreeram_investment_app/modules/more/view/more_view.dart';
+import 'package:shreeram_investment_app/modules/nominee/controller/nominee_controller.dart';
 import 'package:shreeram_investment_app/modules/profile/view/profile_view.dart';
 
 class AddNomineeScreen extends StatefulWidget {
@@ -11,16 +11,7 @@ class AddNomineeScreen extends StatefulWidget {
 }
 
 class _AddNomineeScreenState extends State<AddNomineeScreen> {
-  String? selectedRelation;
-  String? selectedProof = "Aadhaar";
-  bool sameAddress = false;
-
-  // Text controllers to save data
-  final nomineeNameCtrl = TextEditingController();
-  final dobDDCtrl = TextEditingController();
-  final dobMMCtrl = TextEditingController();
-  final dobYYCtrl = TextEditingController();
-  final lastDigitsCtrl = TextEditingController();
+  final NomineeController controller = Get.put(NomineeController());
 
   @override
   Widget build(BuildContext context) {
@@ -73,15 +64,15 @@ class _AddNomineeScreenState extends State<AddNomineeScreen> {
                 ),
               ),
 
-              _buildTextField("Nominee's Name", nomineeNameCtrl),
+              _buildTextField("Nominee's Name", controller.nomineeNameCtrl),
 
               const SizedBox(height: 16),
 
               _buildDropdown(
                 title: "Relation",
-                value: selectedRelation,
+                value: controller.selectedRelation,
                 items: ["Father", "Mother", "Spouse", "Son", "Daughter"],
-                onChanged: (val) => setState(() => selectedRelation = val),
+                onChanged: (val) => setState(() => controller.selectedRelation = val),
               ),
 
               const SizedBox(height: 22),
@@ -91,11 +82,11 @@ class _AddNomineeScreenState extends State<AddNomineeScreen> {
 
               Row(
                 children: [
-                  Expanded(child: _buildTextField("DD", dobDDCtrl)),
+                  Expanded(child: _buildTextField("DD", controller.dobDDCtrl)),
                   const SizedBox(width: 8),
-                  Expanded(child: _buildTextField("MM", dobMMCtrl)),
+                  Expanded(child: _buildTextField("MM", controller.dobMMCtrl)),
                   const SizedBox(width: 8),
-                  Expanded(child: _buildTextField("YYYY", dobYYCtrl)),
+                  Expanded(child: _buildTextField("YYYY", controller.dobYYCtrl)),
                 ],
               ),
 
@@ -109,13 +100,16 @@ class _AddNomineeScreenState extends State<AddNomineeScreen> {
                   Expanded(
                     child: _buildDropdown(
                       title: "Aadhaar",
-                      value: selectedProof,
-                      items: ["Aadhaar", "PAN", "Passport", "Voter ID"],
-                      onChanged: (val) => setState(() => selectedProof = val),
+                      value: controller.selectedProof,
+                      items: ["Aadhaar", "Aadhaar card", "PAN", "VoterID", "Passport", "Other"],
+                      onChanged: (val) => setState(() => controller.selectedProof = val),
                     ),
                   ),
                   const SizedBox(width: 10),
-                  Expanded(child: _buildTextField("Last 4 digits", lastDigitsCtrl)),
+                  Expanded(child: _buildTextField(
+                    controller.selectedProof == "Aadhaar" ? "Full Aadhaar Number" : "Last 4 digits",
+                    controller.lastDigitsCtrl
+                  )),
                 ],
               ),
 
@@ -124,8 +118,8 @@ class _AddNomineeScreenState extends State<AddNomineeScreen> {
               Row(
                 children: [
                   Checkbox(
-                    value: sameAddress,
-                    onChanged: (val) => setState(() => sameAddress = val!),
+                    value: controller.sameAddress,
+                    onChanged: (val) => setState(() => controller.sameAddress = val!),
                     activeColor: Colors.white,
                     checkColor: Colors.black,
                   ),
@@ -151,14 +145,14 @@ class _AddNomineeScreenState extends State<AddNomineeScreen> {
 
                   Expanded(
                     child: _buildYellowButton("Skip", onTap: () {
-                      _goToNextScreen(); // SKIP NEXT
+                      controller.goToNextScreen(); // SKIP NEXT
                     }),
                   ),
                   const SizedBox(width: 10),
 
                   Expanded(
-                    child: _buildBlackButton("Continue", onTap: () {
-                      _saveNomineeDetails(); // SAVE + NEXT
+                    child: _buildBlackButton("Complete", onTap: () {
+                      controller.submitNominee();
                     }),
                   ),
                 ],
@@ -171,35 +165,6 @@ class _AddNomineeScreenState extends State<AddNomineeScreen> {
   }
 
   // ------------------ METHODS ---------------------
-
-  void _saveNomineeDetails() {
-    if (nomineeNameCtrl.text.isEmpty ||
-        selectedRelation == null ||
-        dobDDCtrl.text.isEmpty ||
-        dobMMCtrl.text.isEmpty ||
-        dobYYCtrl.text.isEmpty ||
-        lastDigitsCtrl.text.isEmpty) {
-      Get.snackbar("Error", "Please fill all required fields",
-          backgroundColor: Colors.redAccent, colorText: Colors.white);
-      return;
-    }
-
-    // Store data (you can send it to API)
-    print("Nominee Saved:");
-    print("Name: ${nomineeNameCtrl.text}");
-    print("Relation: $selectedRelation");
-    print("DOB: ${dobDDCtrl.text}-${dobMMCtrl.text}-${dobYYCtrl.text}");
-    print("Proof: $selectedProof");
-    print("Last Digits: ${lastDigitsCtrl.text}");
-    print("Same Address: $sameAddress");
-
-    _goToNextScreen();
-  }
-
-  void _goToNextScreen() {
-    // Replace with your next screen navigation
-    Get.to(() => ProfilePage()); 
-  }
 
   // --------------- Widgets ---------------------
 

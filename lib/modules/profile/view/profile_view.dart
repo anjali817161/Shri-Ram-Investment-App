@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shreeram_investment_app/modules/auth/login/login_screen.dart';
 import 'package:shreeram_investment_app/modules/bankdetails/view/bank_details.dart';
 import 'package:shreeram_investment_app/modules/home/view/home_view.dart';
+import 'package:shreeram_investment_app/modules/profile/widgets/documents_page.dart';
 import 'package:shreeram_investment_app/modules/profile/widgets/general_details.dart';
 import '../controller/profile_controller.dart';
 
@@ -94,6 +97,28 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 );
                 }),
+
+//                 Obx(() {
+//   final isCompleted = controller.isKycCompleted;
+
+//   return GestureDetector(
+//     onTap: isCompleted ? null : () {
+//       Get.to(() => BankDetailsPage());
+//     },
+//     child: Container(
+//       decoration: BoxDecoration(
+//         color: isCompleted ? Colors.green : Colors.red.shade400,
+//         borderRadius: BorderRadius.circular(6),
+//       ),
+//       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+//       child: Text(
+//         isCompleted ? "KYC Completed" : "KYC Pending",
+//         style: const TextStyle(color: Colors.white, fontSize: 12),
+//       ),
+//     ),
+//   );
+// }),
+
                
                 GestureDetector(
                   onTap: (){
@@ -181,7 +206,9 @@ class _ProfilePageState extends State<ProfilePage> {
             _buildMenuItem(
               icon: Icons.file_download_outlined,
               title: "Reports & documents",
-              onTap: (){},
+              onTap: (){
+                Get.to(() => DocumentsPage());
+              },
             ),
             // _buildMenuItem(
             //   icon: Icons.account_balance_outlined,
@@ -192,7 +219,9 @@ class _ProfilePageState extends State<ProfilePage> {
             _buildMenuItem(
               icon: Icons.logout_outlined,
               title: "Logout",
-              onTap: (){},
+              onTap: (){
+                  _showLogoutDialog();
+              },
             ),
            
           ],
@@ -221,4 +250,44 @@ class _ProfilePageState extends State<ProfilePage> {
       ],
     );
   }
+
+  void _showLogoutDialog() {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        backgroundColor: Colors.black,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: const Text(
+          "Logout",
+          style: TextStyle(color: Colors.white, fontSize: 18),
+        ),
+        content: const Text(
+          "Are you sure you want to logout?",
+          style: TextStyle(color: Colors.white70, fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Get.back(); // Close popup
+            },
+            child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+          ),
+          TextButton(
+            onPressed: () async {
+              // REMOVE TOKEN
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              await prefs.remove("token");
+
+              // Navigate to Login Page
+              Get.offAll(() => LoginScreen());
+            },
+            child: const Text("Yes", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 }

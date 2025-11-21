@@ -40,6 +40,16 @@ class ProfileController extends GetxController {
     }
   }
 
+//   bool get isKycCompleted {
+//   final u = user.value;
+
+//   // CHANGE THIS CONDITION ACCORDING TO YOUR MODEL
+//   return u?.bankDetails != null &&
+//          u?.nomineeDetails != null &&
+//          u?.aadhaarDetails != null;
+// }
+
+
   /// ---------------- UPDATE PROFILE ---------------
   Future<void> updateSingleField(String key, String value) async {
     isSaving.value = true;

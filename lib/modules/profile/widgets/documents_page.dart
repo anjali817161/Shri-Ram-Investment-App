@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shreeram_investment_app/modules/profile/controller/document_controllr.dart';
 import 'pdf_generator.dart';  // <-- create this file (code below)
 
 class DocumentsPage extends StatelessWidget {
@@ -77,40 +78,6 @@ class DocumentsPage extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class DocumentController extends GetxController {
-  // These values will come dynamically from API
-  String customerName = "Anjali";
-  String email = "chaudharyanjali6300@gmail.com";
-  String bankName = "Demo Bank";
-  String accountNumber = "77108100003357";
-  String ifsc = "BARB0VIJEON";
-
-  String investmentId = "6916c50a16847721d5dc0b4b";
-  String amount = "2,00,000";
-  String interestRate = "12% p.a.";
-  String tenure = "2 years";
-  String dateOfIssue = "11/14/2025";
-  String maturityDate = "11/14/2027";
-  String maturityValue = "2,48,000";
-
-  Future<void> generateCertificatePdf() async {
-    await PdfGenerator.generateFDcertificate(
-      customerName: customerName,
-      email: email,
-      bankName: bankName,
-      accountNumber: accountNumber,
-      ifsc: ifsc,
-      investmentId: investmentId,
-      investedAmount: amount,
-      interestRate: interestRate,
-      tenure: tenure,
-      issueDate: dateOfIssue,
-      maturityDate: maturityDate,
-      maturityValue: maturityValue,
     );
   }
 }

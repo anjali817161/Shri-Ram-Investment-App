@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shreeram_investment_app/modules/bankdetails/controller/bankdetails_controller.dart';
 import 'package:shreeram_investment_app/modules/bankdetails/view/capture_image.dart';
+import 'package:shreeram_investment_app/services/auth_repository.dart';
+import 'package:shreeram_investment_app/services/sharedPreferences.dart';
 
 class BankDetailsPage extends StatefulWidget {
   const BankDetailsPage({super.key});
@@ -14,6 +17,8 @@ class _BankDetailsPageState extends State<BankDetailsPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _ifscController = TextEditingController();
   final TextEditingController _accountController = TextEditingController();
+
+  final BankdetailsController bankController = Get.put(BankdetailsController());
 
   @override
   void initState() {
@@ -39,7 +44,6 @@ class _BankDetailsPageState extends State<BankDetailsPage> {
     await prefs.setString("accountNumber", accountNumber);
 
     // Debugging prints
-    print("Bank details saved to local storage:");
     print("IFSC: $ifsc");
     print("Account Number: $accountNumber");
 
@@ -50,31 +54,32 @@ class _BankDetailsPageState extends State<BankDetailsPage> {
     print("Verification - Saved Account: $savedAccount");
   }
 
-  /// Submit Form
-  void _submitForm() async {
-    if (_formKey.currentState!.validate()) {
-      print("Form validated. Proceeding to save bank details.");
-      await _saveBankDetails();
-      print("Bank details saved. Clearing fields and showing success snackbar.");
+ void _submitForm() async {
+  if (_formKey.currentState!.validate()) {
+    
+    String ifsc = _ifscController.text.trim();
+    String account = _accountController.text.trim();
 
-      // Clear the fields
-      _ifscController.clear();
-      _accountController.clear();
+    // 🔹 Call API
+    bool success = await bankController.submitBankInfo(account, ifsc);
+
+    if (success) {
+      // 🔹 Save locally only if API success
+      await _saveBankDetails();
 
       Get.snackbar(
-        'Success',
-        'Bank details saved successfully!',
+        "Success",
+        "Bank details submitted successfully!",
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.green.shade600,
         colorText: Colors.white,
       );
 
-      print("Navigating to CaptureImagePage.");
       Get.to(() => const CaptureImagePage());
-    } else {
-      print("Form validation failed.");
     }
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

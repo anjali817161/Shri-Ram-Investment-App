@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:shreeram_investment_app/modules/nominee/view/add_nominee.dart';
 import 'package:shreeram_investment_app/services/auth_repository.dart';
 
 class KycController extends GetxController {
@@ -52,7 +53,7 @@ class KycController extends GetxController {
             backgroundColor: Colors.green, colorText: Colors.white);
 
         await Future.delayed(Duration(seconds: 1));
-        Get.toNamed("/add-nominee"); // Your next screen
+        Get.to(() => AddNomineeScreen());
       } else {
         Get.snackbar("Error", "Something went wrong!",
             backgroundColor: Colors.red, colorText: Colors.white);
