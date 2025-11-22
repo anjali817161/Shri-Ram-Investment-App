@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:get/get_connect/http/src/multipart/form_data.dart';
 import 'package:get/get_connect/http/src/multipart/multipart_file.dart';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shreeram_investment_app/modules/portfolio/model/portfolio_model.dart';
 import 'package:shreeram_investment_app/services/api_endpoints.dart';
 import 'package:shreeram_investment_app/services/sharedPreferences.dart';
 
@@ -447,6 +449,51 @@ Future<http.StreamedResponse> uploadKycDocuments({
     };
   }
 }
+ // Fetch all investments for a user
+  Future<Map<String, dynamic>> fetchUserInvestments({
+    required String userId,
+    required String token,
+  }) async {
+    final url = Uri.parse("https://shriraminvestment-app.onrender.com/api/investment/user/$userId");
+    final res = await http.get(url, headers: {
+      "Authorization": "Bearer $token",
+      "Content-Type": "application/json",
+    });
+    return {
+      "status": res.statusCode,
+      "body": res.body,
+    };
+  }
+
+  // Download generated investment PDF by investmentId (server endpoint returns blob or downloadUrl)
+  // If server returns a downloadUrl JSON you should call that. Here we call an endpoint that returns the file.
+  Future<File> downloadInvestmentReportBlob({
+    required String investmentId,
+    required String token,
+  }) async {
+    final url = Uri.parse("https://shriraminvestment-app.onrender.com/api/investments/generate-old-report/$investmentId");
+    final resp = await http.get(url, headers: {"Authorization": "Bearer $token"});
+    if (resp.statusCode != 200) {
+      throw Exception("Failed to download report: ${resp.statusCode}");
+    }
+
+    final bytes = resp.bodyBytes;
+    final dir = await getTemporaryDirectory();
+    final file = File("${dir.path}/investment_report_$investmentId.pdf");
+    await file.writeAsBytes(bytes);
+    return file;
+  }
+
+  // If backend returns a downloadUrl (JSON) instead, use this helper to fetch that file.
+  Future<File> downloadFromUrl(String downloadUrl, String filename) async {
+    final resp = await http.get(Uri.parse(downloadUrl));
+    if (resp.statusCode != 200) throw Exception("Failed to download file");
+    final dir = await getTemporaryDirectory();
+    final file = File("${dir.path}/$filename");
+    await file.writeAsBytes(resp.bodyBytes);
+    return file;
+  }
+
 
 
 }

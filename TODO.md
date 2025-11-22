@@ -1,6 +1,10 @@
-# Bank Details Submission Implementation
+# TODO for Fixing Invest Form Submit Logic
 
-## Pending Tasks
-- [x] Add submitBankDetails method to AuthRepository in lib/services/auth_repository.dart
-- [x] Update _submitForm in lib/modules/bankdetails/view/bank_details.dart to call API instead of local save
-- [x] Test the API integration and error handling
+## Tasks
+- [ ] Add debugging print statements in invest_controller.dart submitInvestment method
+- [ ] Add validation prints in submitInvestment to check field values
+- [ ] Add prints for token and userId retrieval
+- [ ] Add prints before and after API request
+- [ ] Test the submit functionality and check terminal output
+- [ ] Fix any identified issues in submit logic (e.g., API endpoint, field names, error handling)
+- [ ] Ensure navigation to PortfolioView on success

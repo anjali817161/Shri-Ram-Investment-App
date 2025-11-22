@@ -2,15 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shreeram_investment_app/modules/invest_form/controller/invest_controller.dart';
 import 'package:shreeram_investment_app/modules/portfolio/view/portfolio_view.dart';
-
-// Dummy controller (Replace with your actual GetX controller)
-class BankController extends GetxController {
-  var accountNumber = "1234 5678 9876".obs;
-  var accountHolder = "Anjali Chaudhary".obs;
-  var ifsc = "HDFC0001234".obs;
-  var bankName = "HDFC Bank".obs;
-}
 
 class InvestmentDetailsPage extends StatefulWidget {
   const InvestmentDetailsPage({super.key});
@@ -20,10 +13,11 @@ class InvestmentDetailsPage extends StatefulWidget {
 }
 
 class _InvestmentDetailsPageState extends State<InvestmentDetailsPage> {
+  final InvestmentController investController = Get.put(InvestmentController());
+
   final TextEditingController amountController = TextEditingController();
   final TextEditingController durationController = TextEditingController();
   final TextEditingController agentIdController = TextEditingController();
-  final BankController bankController = Get.put(BankController());
 
   File? proofImage;
 
@@ -35,6 +29,8 @@ class _InvestmentDetailsPageState extends State<InvestmentDetailsPage> {
       setState(() {
         proofImage = File(image.path);
       });
+
+      investController.setProofImage(proofImage!);
     }
   }
 
@@ -73,21 +69,27 @@ class _InvestmentDetailsPageState extends State<InvestmentDetailsPage> {
 
                 const SizedBox(height: 10),
 
+                // Amount Field
                 _buildInputField(
                   controller: amountController,
                   hint: "Invested Amount (₹)",
+                  onChanged: (v) => investController.investedAmount.value = v,
                 ),
                 const SizedBox(height: 15),
 
+                // Duration Field
                 _buildInputField(
                   controller: durationController,
                   hint: "Time Duration (in years)",
+                  onChanged: (v) => investController.timeDuration.value = v,
                 ),
                 const SizedBox(height: 15),
 
+                // Agent ID Field
                 _buildInputField(
                   controller: agentIdController,
                   hint: "Agent ID",
+                  onChanged: (v) => investController.agentId.value = v,
                 ),
                 const SizedBox(height: 20),
 
@@ -102,8 +104,7 @@ class _InvestmentDetailsPageState extends State<InvestmentDetailsPage> {
                 GestureDetector(
                   onTap: pickImage,
                   child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
                     decoration: BoxDecoration(
                       color: Colors.black,
                       borderRadius: BorderRadius.circular(8),
@@ -111,8 +112,7 @@ class _InvestmentDetailsPageState extends State<InvestmentDetailsPage> {
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.upload_file,
-                            color: Colors.white70, size: 20),
+                        const Icon(Icons.upload_file, color: Colors.white70),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
@@ -130,7 +130,7 @@ class _InvestmentDetailsPageState extends State<InvestmentDetailsPage> {
 
                 const SizedBox(height: 20),
 
-                // ⭐⭐⭐ IMAGE PREVIEW HERE ⭐⭐⭐
+                // Preview
                 if (proofImage != null)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -157,13 +157,10 @@ class _InvestmentDetailsPageState extends State<InvestmentDetailsPage> {
                     ],
                   ),
 
-                // 🔥 Bank Details Card (unchanged)
-                if (proofImage != null) _buildBankCard(),
-
                 const SizedBox(height: 30),
 
                 // Submit Button
-                Container(
+                Obx(() => Container(
                   width: double.infinity,
                   height: 50,
                   decoration: BoxDecoration(
@@ -171,24 +168,27 @@ class _InvestmentDetailsPageState extends State<InvestmentDetailsPage> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: ElevatedButton(
-                    onPressed: () {
-                      Get.snackbar("success", "Investment details saved successfully", backgroundColor: Colors.green);
-                      Get.to(() => PortfolioView());
-                    },
+                    onPressed: investController.isLoading.value
+                        ? null
+                        : () {
+                            investController.submitInvestment();
+                          },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,
                       shadowColor: Colors.transparent,
                     ),
-                    child: const Text(
-                      "Submit",
-                      style: TextStyle(
-                        fontSize: 17,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    child: investController.isLoading.value
+                        ? const CircularProgressIndicator(color: Colors.black)
+                        : const Text(
+                            "Submit",
+                            style: TextStyle(
+                              fontSize: 17,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                   ),
-                ),
+                )),
               ],
             ),
           ),
@@ -200,11 +200,13 @@ class _InvestmentDetailsPageState extends State<InvestmentDetailsPage> {
   Widget _buildInputField({
     required TextEditingController controller,
     required String hint,
+    required Function(String) onChanged,
   }) {
     return TextField(
       controller: controller,
       style: const TextStyle(color: Colors.white),
       cursorColor: Colors.white,
+      onChanged: onChanged,
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.white54),
@@ -218,51 +220,6 @@ class _InvestmentDetailsPageState extends State<InvestmentDetailsPage> {
           borderSide: const BorderSide(color: Colors.white, width: 1.2),
           borderRadius: BorderRadius.circular(10),
         ),
-      ),
-    );
-  }
-
-  Widget _buildBankCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white24),
-      ),
-      child: Obx(
-        () => Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _bankRow("Bank Name:", bankController.bankName.value),
-            _bankRow("Account Holder:", bankController.accountHolder.value),
-            _bankRow("Account Number:", bankController.accountNumber.value),
-            _bankRow("IFSC Code:", bankController.ifsc.value),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _bankRow(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Row(
-        children: [
-          Text(
-            title,
-            style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w500),
-          ),
-          const SizedBox(width: 6),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
       ),
     );
   }

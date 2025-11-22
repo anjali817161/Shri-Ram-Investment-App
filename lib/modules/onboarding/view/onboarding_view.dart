@@ -5,6 +5,7 @@ import 'package:shreeram_investment_app/modules/auth/login/login_screen.dart';
 import 'package:shreeram_investment_app/modules/auth/mpin/set_mpin_screen.dart';
 import 'package:shreeram_investment_app/modules/home/view/home_view.dart';
 import 'package:shreeram_investment_app/modules/onboarding/controller/onboarding_controller.dart';
+import 'package:shreeram_investment_app/services/sharedPreferences.dart';
 
 class OnboardingView extends StatefulWidget {
   const OnboardingView({super.key});
@@ -114,11 +115,23 @@ class _OnboardingViewState extends State<OnboardingView> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                onPressed: () {
-                  Get.to(() => LoginScreen());
-                  //  Get.offAll(() => InvestmentHomeScreen());
-                
-                },
+               onPressed: () {
+  final token = SharedPrefs.getToken();
+  final isRegistered = SharedPrefs.getRegistered();
+
+  if (token != null && token.isNotEmpty) {
+    // User is logged in
+    if (isRegistered) {
+      Get.offAll(() =>  InvestmentHomeScreen());
+    } else {
+      Get.offAll(() =>  UserBasicDetailsPage());
+    }
+  } else {
+    // No token → take to login
+    Get.to(() => LoginScreen());
+  }
+},
+
                 child: const Text(
                   'Get Started',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
