@@ -15,7 +15,7 @@ class ReferController extends GetxController {
 
   void animateAmount() async {
     await Future.delayed(const Duration(milliseconds: 300));
-    for (int i = 0; i <= 500; i += 20) {
+    for (int i = 0; i <= 5000; i += 20) {
       referAmount.value = i;
       await Future.delayed(const Duration(milliseconds: 20));
     }
@@ -29,14 +29,22 @@ class ReferEarnScreen extends StatelessWidget {
 
   // 🔥 UNIQUE STATIC TEXT
   final String shareMessage =
-      "Hey! Earn ₹500 instantly by investing in secure bonds with me on Shriram Investment App. "
+      "Hey! Earn ₹5000 instantly by investing in secure bonds with me on Shriram Investment App. "
       "Use my code 👉 SHREE123 and get reward benefits! 🚀📈";
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      bottomNavigationBar: const BottomNavBar(currentIndex: 2),
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Get.back(),
+        ),
+        title: const Text("Refer & Earn", style: TextStyle(color: Colors.white)),
+      ),
 
       body: SingleChildScrollView(
         child: Column(

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shreeram_investment_app/modules/bankdetails/controller/bankdetails_controller.dart';
 import 'package:shreeram_investment_app/modules/bankdetails/view/capture_image.dart';
+import 'package:shreeram_investment_app/modules/navbar/bottom_navbar.dart';
 import 'package:shreeram_investment_app/services/auth_repository.dart';
 import 'package:shreeram_investment_app/services/sharedPreferences.dart';
 
@@ -26,7 +27,7 @@ class _BankDetailsPageState extends State<BankDetailsPage> {
     _loadSavedBankDetails();
   }
 
-  /// ✅ Fetch saved bank details from local storage
+  /// Fetch saved bank details from local storage
   Future<void> _loadSavedBankDetails() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _ifscController.text = prefs.getString("ifsc") ?? "";
@@ -34,7 +35,7 @@ class _BankDetailsPageState extends State<BankDetailsPage> {
     setState(() {});
   }
 
-  /// ✅ Save bank details locally
+  /// Save bank details locally
   Future<void> _saveBankDetails() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String ifsc = _ifscController.text.trim();
@@ -43,43 +44,39 @@ class _BankDetailsPageState extends State<BankDetailsPage> {
     await prefs.setString("ifsc", ifsc);
     await prefs.setString("accountNumber", accountNumber);
 
-    // Debugging prints
+    // Debug prints
     print("IFSC: $ifsc");
     print("Account Number: $accountNumber");
 
-    // Verify by retrieving
+    // Verify saved data
     String? savedIfsc = prefs.getString("ifsc");
     String? savedAccount = prefs.getString("accountNumber");
     print("Verification - Saved IFSC: $savedIfsc");
     print("Verification - Saved Account: $savedAccount");
   }
 
- void _submitForm() async {
-  if (_formKey.currentState!.validate()) {
-    
-    String ifsc = _ifscController.text.trim();
-    String account = _accountController.text.trim();
+  void _submitForm() async {
+    if (_formKey.currentState!.validate()) {
+      String ifsc = _ifscController.text.trim();
+      String account = _accountController.text.trim();
 
-    // 🔹 Call API
-    bool success = await bankController.submitBankInfo(account, ifsc);
+      bool success = await bankController.submitBankInfo(account, ifsc);
 
-    if (success) {
-      // 🔹 Save locally only if API success
-      await _saveBankDetails();
+      if (success) {
+        await _saveBankDetails();
 
-      Get.snackbar(
-        "Success",
-        "Bank details submitted successfully!",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green.shade600,
-        colorText: Colors.white,
-      );
+        Get.snackbar(
+          "Success",
+          "Bank details submitted successfully!",
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green.shade600,
+          colorText: Colors.white,
+        );
 
-      Get.to(() => const CaptureImagePage());
+        Get.to(() => const CaptureImagePage());
+      }
     }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -106,6 +103,7 @@ class _BankDetailsPageState extends State<BankDetailsPage> {
           )
         ],
       ),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 1),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -118,7 +116,6 @@ class _BankDetailsPageState extends State<BankDetailsPage> {
                 style: TextStyle(color: Colors.grey, fontSize: 14, height: 1.4),
               ),
               const SizedBox(height: 24),
-
               const Text(
                 "ENTER BANK DETAILS",
                 style: TextStyle(
@@ -128,8 +125,6 @@ class _BankDetailsPageState extends State<BankDetailsPage> {
                 ),
               ),
               const SizedBox(height: 10),
-
-              /// IFSC Field
               TextFormField(
                 controller: _ifscController,
                 style: const TextStyle(color: Colors.white),
@@ -157,8 +152,6 @@ class _BankDetailsPageState extends State<BankDetailsPage> {
                 },
               ),
               const SizedBox(height: 16),
-
-              /// Account Number Field
               TextFormField(
                 controller: _accountController,
                 style: const TextStyle(color: Colors.white),
@@ -185,9 +178,7 @@ class _BankDetailsPageState extends State<BankDetailsPage> {
                   return null;
                 },
               ),
-
               const SizedBox(height: 20),
-
               Container(
                 padding: const EdgeInsets.all(12),
                 width: double.infinity,
@@ -200,9 +191,7 @@ class _BankDetailsPageState extends State<BankDetailsPage> {
                   style: TextStyle(color: Colors.grey, fontSize: 13),
                 ),
               ),
-
               const Spacer(),
-
               SizedBox(
                 width: double.infinity,
                 height: 48,

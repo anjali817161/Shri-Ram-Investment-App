@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shreeram_investment_app/modules/auth/bank_info/bank_info.dart';
 import 'package:shreeram_investment_app/modules/auth/login/login_screen.dart';
 import 'package:shreeram_investment_app/modules/bankdetails/view/bank_details.dart';
 import 'package:shreeram_investment_app/modules/home/view/home_view.dart';
 import 'package:shreeram_investment_app/modules/profile/widgets/documents_page.dart';
 import 'package:shreeram_investment_app/modules/profile/widgets/general_details.dart';
+import 'package:shreeram_investment_app/modules/refer/view/refer_page.dart';
 import '../controller/profile_controller.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -154,7 +156,7 @@ class _ProfilePageState extends State<ProfilePage> {
               icon: Icons.account_balance_outlined,
               title: "Bank details",
               onTap: () {
-                Get.to(() => BankDetailsPage());
+                Get.to(() => BankInfoPage());
               },
             ),
             _buildMenuItem(
@@ -162,6 +164,13 @@ class _ProfilePageState extends State<ProfilePage> {
               title: "Reports & documents",
               onTap: () {
                 Get.to(() => DocumentsPage());
+              },
+            ),
+            _buildMenuItem(
+              icon: Icons.card_giftcard,
+              title: "Refer & Earn",
+              onTap: () {
+                Get.to(() => ReferEarnScreen());
               },
             ),
             _buildMenuItem(

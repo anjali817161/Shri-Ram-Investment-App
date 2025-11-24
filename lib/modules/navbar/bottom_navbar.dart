@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shreeram_investment_app/modules/bankdetails/view/bank_details.dart';
+import 'package:shreeram_investment_app/modules/kyc/view/kyc_upload.dart';
 import 'package:shreeram_investment_app/modules/more/view/more_view.dart';
 import 'package:shreeram_investment_app/modules/portfolio/view/portfolio_view.dart';
 import 'package:shreeram_investment_app/modules/profile/view/profile_view.dart';
@@ -29,7 +31,7 @@ class BottomNavBar extends StatelessWidget {
             break;
           case 2:
             // navigate to ReferAndEarnView()
-            Get.off(() => ReferEarnScreen());
+            Get.off(() => BankDetailsPage());
 
             break;
           case 3:
@@ -40,11 +42,11 @@ class BottomNavBar extends StatelessWidget {
         }
       },
       items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.show_chart), label: 'Bonds'),
+        BottomNavigationBarItem(icon: Icon(Icons.show_chart), label: 'FDs'),
         BottomNavigationBarItem(
             icon: Icon(Icons.account_balance_wallet), label: 'Portfolio'),
         BottomNavigationBarItem(
-            icon: Icon(Icons.card_giftcard), label: 'Refer & Earn'),
+            icon: Icon(Icons.card_giftcard), label: 'KYC'),
         BottomNavigationBarItem(icon: Icon(Icons.more_horiz), label: 'More'),
       ],
     );

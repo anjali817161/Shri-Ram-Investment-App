@@ -36,12 +36,12 @@ class DocumentController extends GetxController {
         Uri.parse("https://shriraminvestment-app.onrender.com/api/investments/report/$userId"),
         headers: {
           "Authorization": "Bearer $token",
-          "Content-Type": "application/json",
         },
       );
 
       print("📡 API Response Status: ${response.statusCode}");
-      print("📄 API Response Body Length: ${response.body.length}");
+      print("📄 API Response Content-Type: ${response.headers['content-type']}");
+      print("📄 API Response Body Length: ${response.bodyBytes.length}");
 
       if (response.statusCode == 404) {
         print("⚠️ No investments found for user");
@@ -57,46 +57,59 @@ class DocumentController extends GetxController {
         return;
       }
 
-      print("✅ API call successful, parsing response...");
-      // Parse the response data
-      final data = json.decode(response.body);
-      print("📊 Parsed data keys: ${data.keys.toList()}");
+      final contentType = response.headers['content-type'] ?? '';
 
-      // Assuming the API returns investment details in JSON format
-      // You may need to adjust based on actual API response structure
-      final investments = data['investments'] ?? [];
-      print("📈 Number of investments found: ${investments.length}");
+      if (contentType.contains('application/pdf')) {
+        // The response is a PDF file, save and open it directly
+        final dir = await getTemporaryDirectory();
+        final filePath = '${dir.path}/fd_certificate_${DateTime.now().millisecondsSinceEpoch}.pdf';
+        final file = File(filePath);
+        await file.writeAsBytes(response.bodyBytes);
+        print("✅ PDF file saved at: $filePath");
+        await OpenFile.open(file.path);
+        Get.snackbar("Success", "Investment report PDF downloaded successfully!");
+      } else if (contentType.contains('application/json')) {
+        print("✅ API call successful, parsing JSON response...");
+        // Parse the response data as JSON
+        final data = json.decode(response.body);
+        print("📊 Parsed data keys: ${data.keys.toList()}");
 
-      if (investments.isEmpty) {
-        print("⚠️ No investment data available");
-        Get.snackbar("Info", "No investment data available.");
+        final investments = data['investments'] ?? [];
+        print("📈 Number of investments found: ${investments.length}");
+
+        if (investments.isEmpty) {
+          print("⚠️ No investment data available");
+          Get.snackbar("Info", "No investment data available.");
+          return;
+        }
+
+        // For simplicity, generate PDF for the first investment
+        final investment = investments[0];
+        print("🎯 Processing first investment: ${investment['investmentId'] ?? 'Unknown'}");
+
+        print("📄 Generating PDF with dynamic data...");
+        await PdfGenerator.generateFDcertificate(
+          customerName: investment['customerName'] ?? 'N/A',
+          email: investment['email'] ?? 'N/A',
+          bankName: investment['bankName'] ?? 'N/A',
+          accountNumber: investment['accountNumber'] ?? 'N/A',
+          ifsc: investment['ifsc'] ?? 'N/A',
+          investmentId: investment['investmentId'] ?? 'N/A',
+          investedAmount: investment['investedAmount']?.toString() ?? 'N/A',
+          interestRate: investment['interestRate']?.toString() ?? 'N/A',
+          tenure: investment['tenure']?.toString() ?? 'N/A',
+          issueDate: investment['issueDate'] ?? 'N/A',
+          maturityDate: investment['maturityDate'] ?? 'N/A',
+          maturityValue: investment['maturityValue']?.toString() ?? 'N/A',
+        );
+
+        print("✅ PDF generation completed successfully!");
+        Get.snackbar("Success", "Investment report generated successfully!");
+      } else {
+        print("❌ Unsupported content-type: $contentType");
+        Get.snackbar("Error", "Unsupported response format received from server.");
         return;
       }
-
-      // For simplicity, generate PDF for the first investment
-      // You can modify to generate for all or specific ones
-      final investment = investments[0];
-      print("🎯 Processing first investment: ${investment['investmentId'] ?? 'Unknown'}");
-
-      print("📄 Generating PDF with dynamic data...");
-      // Generate PDF using the PdfGenerator class with dynamic data
-      await PdfGenerator.generateFDcertificate(
-        customerName: investment['customerName'] ?? 'N/A',
-        email: investment['email'] ?? 'N/A',
-        bankName: investment['bankName'] ?? 'N/A',
-        accountNumber: investment['accountNumber'] ?? 'N/A',
-        ifsc: investment['ifsc'] ?? 'N/A',
-        investmentId: investment['investmentId'] ?? 'N/A',
-        investedAmount: investment['investedAmount']?.toString() ?? 'N/A',
-        interestRate: investment['interestRate']?.toString() ?? 'N/A',
-        tenure: investment['tenure']?.toString() ?? 'N/A',
-        issueDate: investment['issueDate'] ?? 'N/A',
-        maturityDate: investment['maturityDate'] ?? 'N/A',
-        maturityValue: investment['maturityValue']?.toString() ?? 'N/A',
-      );
-
-      print("✅ PDF generation completed successfully!");
-      Get.snackbar("Success", "Investment report generated successfully!");
     } catch (e) {
       print("❌ ERROR in PDF generation: $e");
       print("❌ Stack trace: ${StackTrace.current}");

@@ -11,7 +11,7 @@ import '../controller/kyc_controller.dart';
 
 class KycUploadScreen extends StatelessWidget {
   final KycController controller = Get.put(KycController());
-  final ProfileController profileController = Get.find<ProfileController>();
+  final ProfileController profileController = Get.put(ProfileController());
 
   @override
   Widget build(BuildContext context) {

@@ -32,6 +32,7 @@ class _PortfolioViewState extends State<PortfolioView> {
         elevation: 0,
         title: const Text("My Portfolio"),
       ),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 0),
       body: Obx(() {
         if (c.isLoading.value && c.investments.isEmpty) {
           return const Center(child: CircularProgressIndicator());
@@ -138,7 +139,7 @@ class _PortfolioViewState extends State<PortfolioView> {
         ),
         child: Column(
           children: [
-            Text(amount, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            Text(amount, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
             const SizedBox(height: 6),
             Text(label, style: TextStyle(color: Colors.grey.shade400)),
           ],
@@ -190,8 +191,19 @@ class _PortfolioViewState extends State<PortfolioView> {
                   title: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(item['label'], style: const TextStyle(color: Colors.white)),
-                      Text("₹${(item['amount'] as double).toStringAsFixed(0)}", style: TextStyle(color: Colors.grey.shade400)),
+                      Column(
+                        children: [
+                             Text('Investment Due on:', style: const TextStyle(color: Color.fromARGB(255, 187, 187, 187), fontSize: 12)),
+
+                          Text(item['label'], style: const TextStyle(color: Colors.white)),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Text('Amount:', style: const TextStyle(color: Color.fromARGB(255, 187, 187, 187), fontSize: 12)),
+                          Text("₹${(item['amount'] as double).toStringAsFixed(0)}", style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
                     ],
                   ),
                   // Removed trailing 3 dots icon
@@ -234,7 +246,7 @@ class _PortfolioViewState extends State<PortfolioView> {
                       ),
                       Text(
                         "₹${inv.investedAmount}",
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        style: const TextStyle(color: Colors.green, fontWeight: FontWeight.w900, fontSize: 18),
                       ),
                     ],
                   ),
