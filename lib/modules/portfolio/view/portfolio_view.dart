@@ -229,7 +229,7 @@ class _PortfolioViewState extends State<PortfolioView> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        DateFormat('dd MMM yyyy').format(DateTime.parse(inv.date ?? DateTime.now().toString())),
+                        DateFormat('dd MMM yyyy').format(inv.createdAt),
                         style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
                       ),
                       Text(

@@ -62,6 +62,19 @@ class SharedPrefs {
   static String getThemeMode() =>
       _prefs?.getString(keyThemeMode) ?? "dark"; // default dark
 
+
+//set kyc status
+  static const String keyKycStatus = "kycStatus";
+
+static Future<void> setKycStatus(String status) async {
+  await _prefs?.setString(keyKycStatus, status);
+}
+
+static String? getKycStatus() {
+  return _prefs?.getString(keyKycStatus);
+}
+
+
   // =====================================================
   // 🔹 ONBOARDING
   // =====================================================
