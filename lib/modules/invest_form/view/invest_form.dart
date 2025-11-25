@@ -153,9 +153,56 @@ class _InvestmentDetailsPageState extends State<InvestmentDetailsPage> {
                           fit: BoxFit.cover,
                         ),
                       ),
-                      const SizedBox(height: 20),
-                    ],
+                    const SizedBox(height: 20),
+                  ],
+                ),
+
+                // Bank Account Details Card - added by BLACKBOXAI
+                if (proofImage != null)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade800,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white30),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text(
+                          "Bank Account Details 🏦",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Text(
+                          "Account Holder: Shri Ram Investment",
+                          style: TextStyle(color: Colors.white70, fontSize: 14),
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          "Account Number: 6198009300000200",
+                          style: TextStyle(color: Colors.white70, fontSize: 14),
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          "IFSC Code: PUNB0619800",
+                          style: TextStyle(color: Colors.white70, fontSize: 14),
+                        ),
+                        SizedBox(height: 15),
+                        Text(
+                          "📤 Please transfer the invested amount to this account and upload proof.",
+                          style: TextStyle(color: Colors.white70, fontSize: 13),
+                        ),
+                      ],
+                    ),
                   ),
+
 
                 const SizedBox(height: 30),
 
