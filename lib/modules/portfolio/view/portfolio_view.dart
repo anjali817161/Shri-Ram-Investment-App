@@ -1,4 +1,3 @@
-// lib/views/portfolio_view.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shreeram_investment_app/modules/invest_form/view/invest_form.dart';
@@ -7,7 +6,6 @@ import 'package:shreeram_investment_app/modules/navbar/bottom_navbar.dart';
 import 'package:shreeram_investment_app/modules/portfolio/controller/portfolio_controller.dart';
 
 class PortfolioView extends StatefulWidget {
-
   PortfolioView({super.key});
 
   @override
@@ -17,10 +15,12 @@ class PortfolioView extends StatefulWidget {
 class _PortfolioViewState extends State<PortfolioView> {
   final PortfolioInvestmentController c = Get.put(PortfolioInvestmentController());
 
-
+  @override
   void initState() {
     super.initState();
-    c.fetchInvestments();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      c.fetchInvestments();
+    });
   }
 
   @override
@@ -50,15 +50,22 @@ class _PortfolioViewState extends State<PortfolioView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 6),
+
+                /// ---------- ACTIVE INVESTMENT STATS (unchanged) ----------
                 Text("Active investments", style: TextStyle(color: Colors.grey.shade400)),
                 const SizedBox(height: 12),
 
-                // TOP STAT ROW
                 Row(
                   children: [
-                    _statCard("+ ₹${active != null ? c.calculateGainsAndTotal(active)['gains'] : '0'}", "Gains"),
+                    _statCard(
+                      "+ ₹${active != null ? c.calculateGainsAndTotal(active)['gains'] : '0'}",
+                      "Monthly cumulative gain",
+                    ),
                     const SizedBox(width: 8),
-                    _statCard("₹${active != null ? c.calculateGainsAndTotal(active)['total'] : '0'}", "Current value"),
+                    _statCard(
+                      "₹${active != null ? c.calculateGainsAndTotal(active)['total'] : '0'}",
+                      "Cumulative current value",
+                    ),
                     const SizedBox(width: 8),
                     _statCard("₹${active?.investedAmount ?? 0}", "Invested"),
                   ],
@@ -66,15 +73,13 @@ class _PortfolioViewState extends State<PortfolioView> {
 
                 const SizedBox(height: 20),
 
-                // Active investment card (monthly breakdown)
-                if (active != null)
-                  _activeInvestmentCard(active)
-                else
-                  _emptyActiveCard(),
+                /// ---------- REPLACED SECTION START ----------
+                /// Instead of Active Investment Card, we show dynamic dropdown list
+                _dynamicInvestmentDropdownList(),
+                /// ---------- REPLACED SECTION END ----------
 
                 const SizedBox(height: 20),
 
-                // Pending note
                 if (c.pending.value)
                   Container(
                     padding: const EdgeInsets.all(12),
@@ -82,13 +87,15 @@ class _PortfolioViewState extends State<PortfolioView> {
                       color: Colors.orange.shade700,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Text("⏳ Your latest investment will appear after 24 hours.",
-                      style: TextStyle(color: Colors.white)),
+                    child: const Text(
+                      "⏳ Your latest investment will appear after 24 hours.",
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
 
                 const SizedBox(height: 20),
 
-                // Previous investments list
+                /// ---------- PREVIOUS INVESTMENTS ----------
                 if (prev.isNotEmpty)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,7 +108,7 @@ class _PortfolioViewState extends State<PortfolioView> {
 
                 const SizedBox(height: 18),
 
-                // Invest now button
+                /// ---------- INVEST NOW ----------
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -109,26 +116,28 @@ class _PortfolioViewState extends State<PortfolioView> {
                       Get.to(() => const InvestmentDetailsPage());
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white, foregroundColor: Colors.black,
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
                     ),
                     child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 14),
-                      child: Text("Invest now", style: TextStyle(fontWeight: FontWeight.w700)),
+                      child: Text("Invest now",
+                          style: TextStyle(fontWeight: FontWeight.w700)),
                     ),
                   ),
                 ),
+
                 const SizedBox(height: 60),
               ],
             ),
           ),
         );
-      
-      }
-      ),
-     
+      }),
     );
   }
 
+  // --------------------------------------------------------------------------- 
+  // STAT CARD
   Widget _statCard(String amount, String label) {
     return Expanded(
       child: Container(
@@ -139,14 +148,182 @@ class _PortfolioViewState extends State<PortfolioView> {
         ),
         child: Column(
           children: [
-            Text(amount, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+            Text(amount,
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
             const SizedBox(height: 6),
-            Text(label, style: TextStyle(color: Colors.grey.shade400)),
+            Center(child: Text(label, style: TextStyle(color: Colors.grey.shade400, fontSize: 12))),
           ],
         ),
       ),
     );
   }
+Widget _dynamicInvestmentDropdownList() {
+  final list = c.investments;
+
+  if (list.isEmpty) {
+    return _emptyActiveCard();
+  }
+
+  // 🔥 Always sort latest first
+  list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+  return Column(
+    children: List.generate(list.length, (index) {
+      final inv = list[index];
+      final monthList = c.monthlyBreakdownForInvestment(inv);
+
+      return Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.06),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Colors.white.withOpacity(0.08)),
+        ),
+        child: Theme(
+          data: Theme.of(context).copyWith(
+            dividerColor: Colors.transparent,
+          ),
+          child: ExpansionTile(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            collapsedShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+
+            // ------------------------------------------------------------
+            // 🔹 TOP COLLAPSED HEADER
+            // ------------------------------------------------------------
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 💰 Amount
+                Text(
+                  "₹${inv.investedAmount}",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 18,
+                  ),
+                ),
+
+                const SizedBox(height: 4),
+
+                // 📅 Date + Duration (Years)
+                Row(
+                  children: [
+                    Icon(Icons.calendar_month, size: 16, color: Colors.white60),
+                    const SizedBox(width: 5),
+                    Text(
+                      DateFormat('dd MMM yyyy').format(inv.createdAt),
+                      style: const TextStyle(color: Colors.white70, fontSize: 13),
+                    ),
+
+                    const SizedBox(width: 12),
+
+                    Icon(Icons.timelapse_rounded, size: 16, color: Colors.white60),
+                    const SizedBox(width: 5),
+
+                    // 🟢 Years
+                    Text(
+                      "${inv.timeDuration} year${inv.timeDuration > 1 ? 's' : ''}",
+                      style: const TextStyle(color: Colors.white70, fontSize: 13),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+
+            iconColor: Colors.white,
+            collapsedIconColor: Colors.white,
+
+            childrenPadding: EdgeInsets.zero,
+
+            // ------------------------------------------------------------
+            // 🔻 EXPANDED VIEW CONTENT
+            // ------------------------------------------------------------
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.03),
+                  borderRadius: const BorderRadius.vertical(bottom: Radius.circular(14)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // -----------------------------------------------------
+                    // 🔹 Heading text (Dynamic)
+                    // -----------------------------------------------------
+                    Text(
+                      "Monthly breakdown for ₹${inv.investedAmount} (${inv.timeDuration} year${inv.timeDuration > 1 ? 's' : ''})",
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // -----------------------------------------------------
+                    // 🔹 Monthly breakdown LIST
+                    // -----------------------------------------------------
+                    Column(
+                      children: List.generate(monthList.length, (i) {
+                        final m = monthList[i];
+
+                        return Column(
+                          children: [
+                            ListTile(
+                              dense: true,
+                              contentPadding: EdgeInsets.zero,
+
+                              title: Text(
+                                m['label'],
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 15,
+                                ),
+                              ),
+
+                              trailing: Text(
+                                "₹${(m['amount'] as double).toStringAsFixed(0)}",
+                                style: const TextStyle(
+                                  color: Colors.greenAccent,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+
+                              onTap: () => _showMonthActions(
+                                context,
+                                inv.id,
+                                m['label'],
+                                m['amount'],
+                              ),
+                            ),
+
+                            if (i != monthList.length - 1)
+                              Container(
+                                margin: const EdgeInsets.symmetric(vertical: 6),
+                                height: 1,
+                                color: Colors.white12,
+                              ),
+                          ],
+                        );
+                      }),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }),
+  );
+}
+
+
 
   Widget _emptyActiveCard() {
     return Container(
@@ -155,75 +332,19 @@ class _PortfolioViewState extends State<PortfolioView> {
         color: Colors.white.withOpacity(0.03),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: const Text("No active investment found.", style: TextStyle(color: Colors.white70)),
+      child: const Text("No active investment found.",
+          style: TextStyle(color: Colors.white70)),
     );
   }
 
-  Widget _activeInvestmentCard(inv) {
-    final ctrl = Get.find<PortfolioInvestmentController>();
-    final breakdown = ctrl.monthlyBreakdownForInvestment(inv);
-    final df = DateFormat('MMM yyyy');
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.04),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Investment: ₹${inv.investedAmount} • ${inv.timeDuration} year(s)", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
-          Text("Agent: ${inv.agentId}", style: TextStyle(color: Colors.grey.shade400)),
-          const SizedBox(height: 12),
-
-          // monthly list scrollable
-          SizedBox(
-            height: 400,
-            child: ListView.separated(
-              itemCount: breakdown.length,
-              separatorBuilder: (_,__) => Divider(color: Colors.grey.shade700), // grey divider
-              itemBuilder: (context, index) {
-                final item = breakdown[index];
-                return ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
-                  title: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        children: [
-                             Text('Investment Due on:', style: const TextStyle(color: Color.fromARGB(255, 187, 187, 187), fontSize: 12)),
-
-                          Text(item['label'], style: const TextStyle(color: Colors.white)),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          Text('Amount:', style: const TextStyle(color: Color.fromARGB(255, 187, 187, 187), fontSize: 12)),
-                          Text("₹${(item['amount'] as double).toStringAsFixed(0)}", style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
-                        ],
-                      ),
-                    ],
-                  ),
-                  // Removed trailing 3 dots icon
-                  onTap: () => _showMonthActions(context, inv.id, item['label'], item['amount']),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
+  // --------------------------------------------------------------------------- 
+  // PREVIOUS INVESTMENT TILE (unchanged)
   Widget _previousInvestmentTile(inv) {
     final ctrl = Get.find<PortfolioInvestmentController>();
     final gainsTotal = ctrl.calculateGainsAndTotal(inv);
+
     return InkWell(
-      onTap: () {
-        _showMonthActions(context, inv.id, "Monthly Details", 0);
-      },
+      onTap: () => _showMonthActions(context, inv.id, "Monthly Details", 0),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(12),
@@ -234,35 +355,56 @@ class _PortfolioViewState extends State<PortfolioView> {
         child: Row(
           children: [
             Expanded(
-              child: Column(
+                child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                    DateFormat('dd MMM yyyy').format(inv.createdAt),
+                    style: const TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                    Column(
                     children: [
                       Text(
-                        DateFormat('dd MMM yyyy').format(inv.createdAt),
-                        style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        "₹${inv.investedAmount}",
-                        style: const TextStyle(color: Colors.green, fontWeight: FontWeight.w900, fontSize: 18),
+                      "₹${inv.investedAmount}",
+                      style: const TextStyle(
+                        color: Colors.green, fontWeight: FontWeight.w900, fontSize: 18),
                       ),
                     ],
+                    ),
+                  ],
                   ),
-                  const SizedBox(height: 6),
-                  Text("Total: ₹${gainsTotal['total'] ?? '-'} | Gains: +₹${gainsTotal['gains'] ?? '-'}",
-                      style: TextStyle(color: Colors.grey.shade400)),
+                  const SizedBox(height: 5),
+                  Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                    "Total: ₹${gainsTotal['total'] ?? '-'} | Gains: +₹${gainsTotal['gains'] ?? '-'}",
+                    style: TextStyle(color: Colors.grey.shade400),
+                    ),
+                    IconButton(
+                    icon: const Icon(Icons.download, color: Colors.white70),
+                    onPressed: () {
+                      final ctrl = Get.find<PortfolioInvestmentController>();
+                      ctrl.downloadInvestmentReport(inv.id);
+                    },
+                    ),
+                  ],
+                  ),
                 ],
               ),
             ),
-            // Remove the IconButton and make whole card clickable, so no trailing icon here
           ],
         ),
       ),
     );
   }
 
+  // --------------------------------------------------------------------------- 
+  // BOTTOM SHEET ACTIONS
   void _showMonthActions(BuildContext context, String investmentId, String monthLabel, double amount) {
     final ctrl = Get.find<PortfolioInvestmentController>();
     showModalBottomSheet(
@@ -277,10 +419,14 @@ class _PortfolioViewState extends State<PortfolioView> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(monthLabel, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+              Text(monthLabel,
+                  style: const TextStyle(
+                      color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
-              Text("Monthly interest: ₹${amount.toStringAsFixed(0)}", style: TextStyle(color: Colors.grey.shade400)),
+              Text("Monthly interest: ₹${amount.toStringAsFixed(0)}",
+                  style: TextStyle(color: Colors.grey.shade400)),
               const SizedBox(height: 16),
+
               Row(
                 children: [
                   Expanded(
@@ -288,11 +434,11 @@ class _PortfolioViewState extends State<PortfolioView> {
                       icon: const Icon(Icons.remove_red_eye),
                       label: const Text("View Details"),
                       onPressed: () {
-                        // For now we show a details dialog. You can expand to full screen details page
                         Navigator.of(context).pop();
                         _showDetailsDialog(context, investmentId, monthLabel, amount);
                       },
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white, foregroundColor: Colors.black),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -304,11 +450,13 @@ class _PortfolioViewState extends State<PortfolioView> {
                         Navigator.of(context).pop();
                         ctrl.downloadInvestmentReport(investmentId);
                       },
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.greenAccent, foregroundColor: Colors.black),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.greenAccent, foregroundColor: Colors.black),
                     ),
                   ),
                 ],
               ),
+
               const SizedBox(height: 10),
             ],
           ),
@@ -317,16 +465,23 @@ class _PortfolioViewState extends State<PortfolioView> {
     );
   }
 
-  void _showDetailsDialog(BuildContext context, String investmentId, String monthLabel, double amount) {
+  // --------------------------------------------------------------------------- 
+  void _showDetailsDialog(
+      BuildContext context, String investmentId, String monthLabel, double amount) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xff0E0E0E),
         title: Text(monthLabel, style: const TextStyle(color: Colors.white)),
-        content: Text("Monthly interest: ₹${amount.toStringAsFixed(0)}\nInvestmentId: $investmentId",
-          style: const TextStyle(color: Colors.white70)),
+        content: Text(
+          "Monthly interest: ₹${amount.toStringAsFixed(0)}\nInvestmentId: $investmentId",
+          style: const TextStyle(color: Colors.white70),
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text("Close")),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("Close"),
+          ),
         ],
       ),
     );

@@ -1,10 +1,11 @@
-# TODO for Fixing Invest Form Submit Logic
+# TODO for Monthly Report PDF Generation Feature
 
-## Tasks
-- [ ] Add debugging print statements in invest_controller.dart submitInvestment method
-- [ ] Add validation prints in submitInvestment to check field values
-- [ ] Add prints for token and userId retrieval
-- [ ] Add prints before and after API request
-- [ ] Test the submit functionality and check terminal output
-- [ ] Fix any identified issues in submit logic (e.g., API endpoint, field names, error handling)
-- [ ] Ensure navigation to PortfolioView on success
+- [ ] Add method `PdfGenerator.generateMonthlyReport` to generate PDF for a monthly investment report.
+- [ ] Add method `DocumentController.generateMonthlyReportPdf` to generate monthly report PDF locally using `PdfGenerator`.
+- [ ] Add method `PortfolioInvestmentController.generateMonthlyReportPdf` to collect required monthly data and call DocumentController.
+- [ ] Modify `portfolio_view.dart` `_showMonthActions` to call the new monthly report generation method for the "Download PDF" button on monthly items.
+
+Testing:
+- [ ] Test clicking a month from portfolio page monthly breakdown generates correct monthly PDF report.
+- [ ] Ensure no API calls during monthly PDF generation.
+- [ ] Verify no regressions on existing overall PDF report generation.

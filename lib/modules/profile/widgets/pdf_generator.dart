@@ -134,6 +134,77 @@ class PdfGenerator {
     OpenFile.open(file.path);
   }
 
+  static Future<void> generateMonthlyReport({
+    required String investmentId,
+    required String monthLabel,
+    required double amount,
+  }) async {
+    final pdf = pw.Document();
+
+    final logo = await rootBundle.load('assets/images/shri_icon.png');
+    final imageLogo = pw.MemoryImage(logo.buffer.asUint8List());
+
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.all(24),
+        build: (context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Center(child: pw.Image(imageLogo, height: 70)),
+              pw.SizedBox(height: 10),
+              pw.Center(
+                child: pw.Text(
+                  "SHRI RAM INVESTMENT",
+                  style: pw.TextStyle(
+                    fontSize: 22,
+                    fontWeight: pw.FontWeight.bold,
+                    color: PdfColors.red900,
+                  ),
+                ),
+              ),
+              pw.SizedBox(height: 20),
+              pw.Text(
+                "Monthly Investment Report",
+                style: pw.TextStyle(
+                  fontSize: 16,
+                  fontWeight: pw.FontWeight.bold,
+                  color: PdfColors.red900,
+                ),
+              ),
+              pw.SizedBox(height: 12),
+              _table([
+                ["Investment ID", investmentId],
+                ["Month", monthLabel],
+                ["Amount", amount.toStringAsFixed(2)],
+              ]),
+              pw.Spacer(),
+              pw.Center(
+                child: pw.Text(
+                  "This is a system-generated document. It does not require a signature.",
+                  style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey500),
+                ),
+              ),
+              pw.Center(
+                child: pw.Text(
+                  "Keep this certificate safe for your financial records.",
+                  style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey500),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+
+    final dir = await getTemporaryDirectory();
+    final file = File("${dir.path}/monthly_report_${investmentId}_${monthLabel.replaceAll('/', '-')}.pdf");
+    await file.writeAsBytes(await pdf.save());
+
+    OpenFile.open(file.path);
+  }
+
   static pw.Widget _table(List<List<String>> rows) {
     return pw.Table(
       border: pw.TableBorder.all(color: PdfColors.grey600),
