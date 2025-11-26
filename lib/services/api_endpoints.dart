@@ -3,6 +3,7 @@ class ApiEndpoints {
 
   // 🔵 Base URL
   static const String baseUrl = "https://shriraminvestment-app.onrender.com/api/auth/";
+  static const String agentBaseUrl = "https://shriraminvestment-app.onrender.com/api/agents/";
 
   // ============================================================
   // 🔐 AUTH
@@ -14,6 +15,13 @@ class ApiEndpoints {
   static const String baiscDetails = "details";
   static const String createMpin = "create-mpin";
   static const String loginWithMpin = "login-with-mpin";
+
+
+    // ============================================================
+  // 🔐 AGENT
+  // ============================================================
+  static const String register = "register";
+  static const String agentLogin = "login";
 
   // ============================================================
   // 👤 USER PROFILE

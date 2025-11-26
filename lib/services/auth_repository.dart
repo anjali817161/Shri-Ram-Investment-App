@@ -494,6 +494,63 @@ Future<http.StreamedResponse> uploadKycDocuments({
     return file;
   }
 
+ /// 🔹 Register API
+  static Future<Map<String, dynamic>> registerAgent(Map<String, dynamic> body) async {
+  final url = Uri.parse(ApiEndpoints.agentBaseUrl + ApiEndpoints.register);
+  final token = await SharedPrefs.getToken() ?? "";
+
+  print("🌐 REPOSITORY DEBUG: URL = $url");
+  print("🌐 Sending JSON: ${jsonEncode(body)}");
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': 'Bearer $token'
+        },
+      
+      body: jsonEncode(body),
+    );
+print("token ---------$token");
+    print("🌐 API Status Code: ${response.statusCode}");
+    print("🌐 API Raw Response: ${response.body}");
+
+    return {
+      "statusCode": response.statusCode,
+      "data": jsonDecode(response.body)
+    };
+  } catch (e) {
+    print("❌ ERROR in registerAgent(): $e");
+    return {"statusCode": 500, "error": e.toString()};
+  }
+}
+
+//agent login
+  static Future<Map<String, dynamic>> loginAgent(Map<String, dynamic> body) async {
+  final url = Uri.parse(ApiEndpoints.agentBaseUrl + ApiEndpoints.agentLogin);
+    final token = await SharedPrefs.getToken() ?? "";
+
+print("🌐 REPOSITORY DEBUG: URL = $url");
+print("token ---------$token");
+  try {
+    final response = await http.post(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': 'Bearer $token'
+        },
+      body: jsonEncode(body),
+    );
+
+    return {
+      "statusCode": response.statusCode,
+      "data": jsonDecode(response.body)
+    };
+  } catch (e) {
+    return {"statusCode": 500, "error": e.toString()};
+  }
+}
 
 
 }
