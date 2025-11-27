@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:shreeram_investment_app/modules/agent/agentDashboard/controller/agent_dashboard_controller.dart';
+import 'package:shreeram_investment_app/modules/agent/drawer/agent_drawer.dart';
 
 class AgentDashboardView extends StatefulWidget {
-  const AgentDashboardView({super.key});
+  final String userId; // 🔥 passed from login
+  const AgentDashboardView({super.key, required this.userId});
 
   @override
   State<AgentDashboardView> createState() => _AgentDashboardViewState();
@@ -9,23 +13,29 @@ class AgentDashboardView extends StatefulWidget {
 
 class _AgentDashboardViewState extends State<AgentDashboardView>
     with SingleTickerProviderStateMixin {
+
   late AnimationController _animController;
   late Animation<double> _scaleAnim;
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final dashboardController = Get.put(AgentDashboardController());
 
   @override
   void initState() {
     super.initState();
 
+    // ANIMATIONS
     _animController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
-
     _scaleAnim = Tween<double>(begin: 0.92, end: 1.0).animate(
       CurvedAnimation(parent: _animController, curve: Curves.easeOutBack),
     );
-
     _animController.forward();
+
+    // FETCH DASHBOARD DATA
+    dashboardController.fetchDashboard(widget.userId);
   }
 
   @override
@@ -34,6 +44,7 @@ class _AgentDashboardViewState extends State<AgentDashboardView>
     super.dispose();
   }
 
+  // INFO CARDS
   Widget buildInfoCard(String title, String value, {Color? valueColor}) {
     return ScaleTransition(
       scale: _scaleAnim,
@@ -53,13 +64,9 @@ class _AgentDashboardViewState extends State<AgentDashboardView>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              title,
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.75),
-                fontSize: 13,
-              ),
-            ),
+            Text(title,
+                style: TextStyle(
+                    color: Colors.white.withOpacity(0.75), fontSize: 13)),
             const SizedBox(height: 8),
             Text(
               value,
@@ -75,55 +82,28 @@ class _AgentDashboardViewState extends State<AgentDashboardView>
     );
   }
 
-  Widget buildActivityCard({
-    required String client,
-    required String policy,
-    required String date,
-    required String status,
-    required Color statusColor,
-  }) {
+  // ACTIVITY CARD
+  Widget buildActivityCard(Map item) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A1A),
         borderRadius: BorderRadius.circular(14),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Text(
-            client,
-            style: const TextStyle(color: Colors.white, fontSize: 16),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            policy,
-            style:
-                TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 13),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            date,
-            style:
-                TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12),
-          ),
-          const SizedBox(height: 10),
-
-          // status tag
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
-            decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(20),
-            ),
+          Expanded(
             child: Text(
-              status,
-              style: TextStyle(
-                color: statusColor,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
+              item["name"] ?? "Unknown",
+              style: const TextStyle(color: Colors.white, fontSize: 16),
             ),
+          ),
+          Text(
+            "₹${item["amount"] ?? 0}",
+            style: const TextStyle(
+                color: Colors.greenAccent,
+                fontWeight: FontWeight.bold,
+                fontSize: 18),
           ),
         ],
       ),
@@ -133,117 +113,108 @@ class _AgentDashboardViewState extends State<AgentDashboardView>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: const Color(0xFF121212),
+      endDrawer: AgentDrawer(),
 
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1A1A),
         elevation: 0,
-        title: const Text(
-          "Agent Dashboard",
-          style: TextStyle(color: Colors.white),
-        ),
-        centerTitle: false,
+        title: const Text("Agent Dashboard", style: TextStyle(color: Colors.white)),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.menu, color: Colors.white),
+            onPressed: () => _scaffoldKey.currentState?.openEndDrawer(),
+          )
+        ],
       ),
 
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ---- TOP CARDS ----
-            Row(
-              children: [
-                Expanded(
-                  child: buildInfoCard("Total Clients", "12"),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: buildInfoCard("Active Policies", "5"),
-                ),
-              ],
-            ),
+      body: Obx(() {
+        if (dashboardController.isLoading.value) {
+          return const Center(
+            child: CircularProgressIndicator(color: Colors.white),
+          );
+        }
 
-            const SizedBox(height: 12),
-
-            Row(
-              children: [
-                Expanded(
-                  child: buildInfoCard(
-                    "Earnings",
-                    "₹15400",
-                    valueColor: Colors.greenAccent,
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // TOP CARDS
+              Row(
+                children: [
+                  Expanded(
+                    child: buildInfoCard(
+                        "Total Clients",
+                        dashboardController.totalClients.value.toString()
+                    ),
                   ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: buildInfoCard(
+                        "Total Investments",
+                        dashboardController.totalInvestments.value.toString()
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 12),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: buildInfoCard(
+                      "Total Amount",
+                      "₹${dashboardController.totalAmount.value}",
+                      valueColor: Colors.greenAccent,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: buildInfoCard(
+                        "Commission",
+                        "₹${dashboardController.totalCommission.value}"
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 12),
+
+              buildInfoCard(
+                "Avg Investment",
+                "₹${dashboardController.avgInvestment.value}",
+              ),
+
+              const SizedBox(height: 25),
+
+              const Text(
+                "Recent Activities",
+                style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+
+              const SizedBox(height: 12),
+
+              if (dashboardController.recentInvestments.isEmpty)
+                const Text(
+                  "No recent investments",
+                  style: TextStyle(color: Colors.white54, fontSize: 14),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: buildInfoCard("Performance", "87%"),
-                ),
-              ],
-            ),
 
-            const SizedBox(height: 25),
+              ...dashboardController.recentInvestments
+                  .map((e) => Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: buildActivityCard(e),
+              ))
+                  .toList(),
 
-            // -------- Recent Activities --------
-            const Text(
-              "Recent Activities",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            buildActivityCard(
-              client: "Amit Sharma",
-              policy: "Life Secure Plus",
-              date: "2025-11-05",
-              status: "Active",
-              statusColor: Colors.greenAccent,
-            ),
-
-            const SizedBox(height: 10),
-            const Divider(color: Colors.white24, thickness: 0.5),
-            const SizedBox(height: 10),
-
-            buildActivityCard(
-              client: "Neha Patel",
-              policy: "Health Shield",
-              date: "2025-11-04",
-              status: "Pending",
-              statusColor: Colors.orange,
-            ),
-
-            const SizedBox(height: 30),
-
-            // -------- Profile Summary --------
-            const Text(
-              "Agent Profile Summary",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1A1A1A),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: const Text(
-                "Loading agent data...",
-                style: TextStyle(color: Colors.white70, fontSize: 14),
-              ),
-            ),
-
-            const SizedBox(height: 50),
-          ],
-        ),
-      ),
+              const SizedBox(height: 50),
+            ],
+          ),
+        );
+      }),
     );
   }
 }

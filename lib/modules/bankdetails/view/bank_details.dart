@@ -103,7 +103,7 @@ class _BankDetailsPageState extends State<BankDetailsPage> {
           )
         ],
       ),
-      bottomNavigationBar: const BottomNavBar(currentIndex: 1),
+      bottomNavigationBar: const BottomNavBar(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(

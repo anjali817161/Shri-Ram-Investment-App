@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
 
 class PdfGenerator {
@@ -22,174 +22,136 @@ class PdfGenerator {
   }) async {
     final pdf = pw.Document();
 
-    // Load logo if needed
-    final logo = await rootBundle.load('assets/images/shri_icon.png');
-    final imageLogo = pw.MemoryImage(logo.buffer.asUint8List());
+    // LOAD ASSETS
+    final logoData = await rootBundle.load('assets/images/shri_icon.png');
+    final logo = pw.MemoryImage(logoData.buffer.asUint8List());
+
+    final hindiFontData = await rootBundle.load("assets/fonts/NotoSansDevanagari-Regular.ttf");
+    final hindiFont = pw.Font.ttf(hindiFontData);
 
     pdf.addPage(
       pw.Page(
         pageFormat: PdfPageFormat.a4,
-        margin: const pw.EdgeInsets.all(24),
+        margin: const pw.EdgeInsets.all(25),
         build: (context) {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
 
+              // LOGO + HEADER
               pw.Center(
-                child: pw.Image(imageLogo, height: 70),
+                child: pw.Image(logo, height: 65),
               ),
+              pw.SizedBox(height: 8),
 
-              pw.SizedBox(height: 10),
-
-              pw.Center(
-                child: pw.Text(
-                  "SHRI RAM INVESTMENT",
-                  style: pw.TextStyle(
-                    fontSize: 22,
-                    fontWeight: pw.FontWeight.bold,
-                    color: PdfColors.red900,
-                  ),
-                ),
-              ),
-
-              pw.Center(
-                child: pw.Text(
-                  "Fixed Deposit (System Generated Certificate)",
-                  style: const pw.TextStyle(
-                    fontSize: 12,
-                    color: PdfColors.grey600,
-                  ),
-                ),
-              ),
-
-              pw.SizedBox(height: 20),
-
-              pw.Text(
-                "Customer Details",
-                style: pw.TextStyle(
-                  fontSize: 16,
-                  fontWeight: pw.FontWeight.bold,
-                  color: PdfColors.red900,
-                ),
-              ),
-
-              pw.SizedBox(height: 6),
-
-              _table([
-                ["Customer Name", customerName],
-                ["Email", email],
-                ["Bank Name", bankName],
-                ["Account Number", accountNumber],
-                ["IFSC Code", ifsc],
-              ]),
-
-              pw.SizedBox(height: 20),
-
-              pw.Text(
-                "Investment Details",
-                style: pw.TextStyle(
-                  fontSize: 16,
-                  fontWeight: pw.FontWeight.bold,
-                  color: PdfColors.red900,
-                ),
-              ),
-
-              pw.SizedBox(height: 6),
-
-              _table([
-                ["Investment ID", investmentId],
-                ["Invested Amount", investedAmount],
-                ["Interest Rate", interestRate],
-                ["Tenure", tenure],
-                ["Date of Issue", issueDate],
-                ["Maturity Date", maturityDate],
-                ["Maturity Value", maturityValue],
-              ]),
-
-              pw.Spacer(),
-
-              pw.Center(
-                child: pw.Text(
-                  "This is a system-generated document. It does not require a signature.",
-                  style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey500),
-                ),
-              ),
-
-              pw.Center(
-                child: pw.Text(
-                  "Keep this certificate safe for your financial records.",
-                  style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey500),
-                ),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-
-    final dir = await getTemporaryDirectory();
-    final file = File("${dir.path}/fd_certificate.pdf");
-    await file.writeAsBytes(await pdf.save());
-
-    OpenFile.open(file.path);
-  }
-
-  static Future<void> generateMonthlyReport({
-    required String investmentId,
-    required String monthLabel,
-    required double amount,
-  }) async {
-    final pdf = pw.Document();
-
-    final logo = await rootBundle.load('assets/images/shri_icon.png');
-    final imageLogo = pw.MemoryImage(logo.buffer.asUint8List());
-
-    pdf.addPage(
-      pw.Page(
-        pageFormat: PdfPageFormat.a4,
-        margin: const pw.EdgeInsets.all(24),
-        build: (context) {
-          return pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              pw.Center(child: pw.Image(imageLogo, height: 70)),
-              pw.SizedBox(height: 10),
               pw.Center(
                 child: pw.Text(
                   "SHRI RAM INVESTMENT",
                   style: pw.TextStyle(
-                    fontSize: 22,
                     fontWeight: pw.FontWeight.bold,
-                    color: PdfColors.red900,
+                    fontSize: 20,
+                    color: PdfColors.red,
                   ),
                 ),
               ),
-              pw.SizedBox(height: 20),
-              pw.Text(
-                "Monthly Investment Report",
-                style: pw.TextStyle(
-                  fontSize: 16,
-                  fontWeight: pw.FontWeight.bold,
-                  color: PdfColors.red900,
+
+              pw.Center(
+                child: pw.Text(
+                  "e-Fixed Deposit Account Receipt",
+                  style: pw.TextStyle(fontSize: 12),
                 ),
               ),
+
+              pw.SizedBox(height: 18),
+
+              // ACCOUNT + CUSTOMER ROW
+              pw.Table(
+                border: pw.TableBorder.all(color: PdfColors.grey700),
+                children: [
+                  _row("Account No", accountNumber),
+                  _row("Customer Name", customerName),
+                ],
+              ),
+
               pw.SizedBox(height: 12),
-              _table([
-                ["Investment ID", investmentId],
-                ["Month", monthLabel],
-                ["Amount", amount.toStringAsFixed(2)],
-              ]),
-              pw.Spacer(),
+
+              pw.Text(
+                "Deposit Amount: INR $investedAmount for a period of $tenure days at the rate of $interestRate% per annum.",
+                style: pw.TextStyle(fontSize: 11),
+              ),
+
+              pw.SizedBox(height: 15),
+
+              // DATE / MATURITY / SCHEME TABLE
+              pw.Table(
+                border: pw.TableBorder.all(color: PdfColors.grey600),
+                children: [
+                  _dualRow("Date of Issue", issueDate,
+                      "Date of Maturity", maturityDate),
+                  _dualRow("Maturity Value", maturityValue,
+                      "Deposit Scheme", "FD"),
+                  _dualRow("Maturity Instruction", "Auto Renew",
+                      "Nominee", "N/A"),
+                ],
+              ),
+
+              pw.SizedBox(height: 15),
+
+              pw.Table(
+                border: pw.TableBorder.all(color: PdfColors.grey600),
+                children: [
+                  _row("Debit Account Number", accountNumber),
+                  _row("Repayment Account Number", accountNumber),
+                ],
+              ),
+
+              pw.SizedBox(height: 25),
+
+              pw.Text(
+                "Important Instructions:",
+                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 13),
+              ),
+
+              pw.SizedBox(height: 5),
+
+              pw.Bullet(text: "This is not transferable."),
+              pw.Bullet(
+                text:
+                    "The confirmation of deposit is issued based on customer mandate. In case of discrepancy contact branch within 7 days.",
+              ),
+              pw.Bullet(
+                text: "Maturity value & withdrawal are subject to TDS as per Income Tax Act.",
+              ),
+              pw.Bullet(
+                text:
+                    "Deposit will be auto renewed as per scheme applicable on maturity date.",
+              ),
+              pw.Bullet(
+                text:
+                    "Premature withdrawal is subject to penalty as per bank guidelines.",
+              ),
+
+              pw.SizedBox(height: 25),
+
               pw.Center(
                 child: pw.Text(
-                  "This is a system-generated document. It does not require a signature.",
-                  style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey500),
+                  "This is a computer-generated receipt and does not require a signature.",
+                  style: pw.TextStyle(fontSize: 10),
                 ),
               ),
+
+              pw.SizedBox(height: 20),
+
+              /// *** HINDI LINE (WITH FONT) ***
               pw.Center(
                 child: pw.Text(
-                  "Keep this certificate safe for your financial records.",
-                  style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey500),
+                  "श्री राम विकास पत्र",
+                  style: pw.TextStyle(
+                    fontSize: 16,
+                    fontWeight: pw.FontWeight.bold,
+                    font: hindiFont,
+                    color: PdfColors.red800,
+                  ),
                 ),
               ),
             ],
@@ -198,30 +160,36 @@ class PdfGenerator {
       ),
     );
 
+    // SAVE PDF
     final dir = await getTemporaryDirectory();
-    final file = File("${dir.path}/monthly_report_${investmentId}_${monthLabel.replaceAll('/', '-')}.pdf");
+    final file = File("${dir.path}/fd_certificate_new.pdf");
     await file.writeAsBytes(await pdf.save());
-
-    OpenFile.open(file.path);
+    await OpenFile.open(file.path);
   }
 
-  static pw.Widget _table(List<List<String>> rows) {
-    return pw.Table(
-      border: pw.TableBorder.all(color: PdfColors.grey600),
-      columnWidths: {
-        0: const pw.FlexColumnWidth(2),
-        1: const pw.FlexColumnWidth(3),
-      },
-      children: rows
-          .map(
-            (row) => pw.TableRow(
-              children: [
-                _cell(row[0], bold: true),
-                _cell(row[1]),
-              ],
-            ),
-          )
-          .toList(),
+  // ---------- REUSABLE TABLE ROWS ----------
+  static pw.TableRow _row(String k, String v) {
+    return pw.TableRow(
+      children: [
+        _cell(k, bold: true),
+        _cell(v),
+      ],
+    );
+  }
+
+  static pw.TableRow _dualRow(
+    String k1,
+    String v1,
+    String k2,
+    String v2,
+  ) {
+    return pw.TableRow(
+      children: [
+        _cell(k1, bold: true),
+        _cell(v1),
+        _cell(k2, bold: true),
+        _cell(v2),
+      ],
     );
   }
 
@@ -231,7 +199,7 @@ class PdfGenerator {
       child: pw.Text(
         text,
         style: pw.TextStyle(
-          fontSize: 12,
+          fontSize: 11,
           fontWeight: bold ? pw.FontWeight.bold : pw.FontWeight.normal,
         ),
       ),

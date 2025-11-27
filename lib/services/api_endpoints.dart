@@ -22,6 +22,10 @@ class ApiEndpoints {
   // ============================================================
   static const String register = "register";
   static const String agentLogin = "login";
+  static const String agentProfile = "profile";
+    static const String editAgentProfile = "update-profile";
+
+
 
   // ============================================================
   // 👤 USER PROFILE

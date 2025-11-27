@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:shreeram_investment_app/modules/agent/agentDashboard/view/agent_view.dart';
 import 'package:shreeram_investment_app/modules/agent/agent_login/view/agent_login.dart';
 import 'package:shreeram_investment_app/services/auth_repository.dart';
+import 'package:shreeram_investment_app/services/sharedPreferences.dart';
 
 class AgentRegisterController extends GetxController {
   RxBool isLoading = false.obs;
@@ -83,10 +84,18 @@ print("Status Code: ${response["statusCode"]}");
 print("Response Data: ${response["data"]}");
 
   if (response["statusCode"] == 200 || response["statusCode"] == 201) {
+      
+    final token = response["data"]["token"];   // ✅ FIXED
+     final userId = response["data"]["agent"]["userId"];  
+
+    // 🔥 Save Agent Token
+    await SharedPrefs.saveAgentToken(token);
+
+    print("🔥 AGENT TOKEN SAVED: $token");
     Get.snackbar("Success", "Login Successful",
         colorText: Colors.white);
     // Navigate to Dashboard
-    Get.offAll(() => AgentDashboardView());
+    Get.offAll(() => AgentDashboardView(userId: userId,));
   } else {
     Get.snackbar("Login Failed",
         response["data"]?["message"] ?? "Invalid credentials",

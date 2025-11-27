@@ -20,6 +20,7 @@ class SharedPrefs {
   static const String keyIsLoggedIn = "isLoggedIn";
   static const String keyThemeMode = "themeMode"; // dark/light
   static const String keyOnboarding = "onboardingDone";
+  static const String keyAgentToken = "agent_token";
 
   // =====================================================
   // 🔹 TOKEN
@@ -72,6 +73,16 @@ static Future<void> setKycStatus(String status) async {
 
 static String? getKycStatus() {
   return _prefs?.getString(keyKycStatus);
+}
+
+
+
+static Future saveAgentToken(String token) async {
+  await _prefs?.setString(keyAgentToken, token);
+}
+
+static String? getAgentToken() {
+  return _prefs?.getString(keyAgentToken);
 }
 
 

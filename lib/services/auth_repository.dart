@@ -5,6 +5,7 @@ import 'package:get/get_connect/http/src/multipart/multipart_file.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shreeram_investment_app/modules/agent/profile/model/agent_profile_model.dart';
 import 'package:shreeram_investment_app/modules/portfolio/model/portfolio_model.dart';
 import 'package:shreeram_investment_app/services/api_endpoints.dart';
 import 'package:shreeram_investment_app/services/sharedPreferences.dart';
@@ -529,16 +530,13 @@ print("token ---------$token");
 //agent login
   static Future<Map<String, dynamic>> loginAgent(Map<String, dynamic> body) async {
   final url = Uri.parse(ApiEndpoints.agentBaseUrl + ApiEndpoints.agentLogin);
-    final token = await SharedPrefs.getToken() ?? "";
 
 print("🌐 REPOSITORY DEBUG: URL = $url");
-print("token ---------$token");
   try {
     final response = await http.post(
       url,
       headers: {
         "Content-Type": "application/json",
-        'Authorization': 'Bearer $token'
         },
       body: jsonEncode(body),
     );
@@ -551,6 +549,87 @@ print("token ---------$token");
     return {"statusCode": 500, "error": e.toString()};
   }
 }
+
+ /// GET AGENT PROFILE
+  static Future<AgentProfileModel?> fetchAgentProfile() async {
+
+    print(ApiEndpoints.agentBaseUrl + ApiEndpoints.agentProfile);
+    final token = SharedPrefs.getAgentToken();
+    final url = Uri.parse(ApiEndpoints.agentBaseUrl + ApiEndpoints.agentProfile);
+
+    final response = await http.get(
+      url,
+      headers: {"Content-Type": "application/json","Authorization": "Bearer $token"},
+    );
+print("token ---------$token");
+    print("🌐 FETCH PROFILE STATUS: ${response.statusCode}");
+    print("🌐 FETCH PROFILE RESPONSE: ${response.body}");
+
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final jsonBody = jsonDecode(response.body);
+      return AgentProfileModel.fromJson(jsonBody["agent"]);
+    } else {
+      throw Exception("Failed to fetch profile with status: ${response.statusCode}");
+      
+    }
+    
+  }
+  
+
+  /// UPDATE AGENT PROFILE
+  static Future<AgentProfileModel?> updateAgentProfile(
+      Map<String, dynamic> body) async {
+    final token = SharedPrefs.getAgentToken();
+    final url = Uri.parse(ApiEndpoints.agentBaseUrl + ApiEndpoints.editAgentProfile);
+
+    final response = await http.put(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token"
+      },
+      body: jsonEncode(body),
+    );
+
+    print("token ---------$token");
+    print("🌐  PROFILE UPDATE STATUS: ${response.statusCode}");
+    print("🌐  PROFILE UPDATE RESPONSE: ${response.body}");
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final jsonBody = jsonDecode(response.body);
+      return AgentProfileModel.fromJson(jsonBody["agent"]);
+    } else {
+      throw Exception("Update failed");
+    }
+  }
+
+// AUTH REPOSITORY
+static Future<Map<String, dynamic>> getAgentDashboard(String agentId) async {
+  final url = Uri.parse("${ApiEndpoints.agentBaseUrl}dashboard/$agentId");
+
+  final token = await SharedPrefs.getAgentToken() ?? "";
+  print("🔐 Agent Token: $token");
+
+  try {
+    final response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        if (token.isNotEmpty) "Authorization": "Bearer $token",
+      },
+    );
+
+    return {
+      "statusCode": response.statusCode,
+      "data": jsonDecode(response.body),
+    };
+  } catch (e) {
+    return {"statusCode": 500, "error": e.toString()};
+  }
+}
+
+
 
 
 }

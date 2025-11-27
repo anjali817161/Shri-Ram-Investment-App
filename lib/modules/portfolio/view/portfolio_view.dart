@@ -32,7 +32,7 @@ class _PortfolioViewState extends State<PortfolioView> {
         elevation: 0,
         title: const Text("My Portfolio"),
       ),
-      bottomNavigationBar: const BottomNavBar(currentIndex: 0),
+      bottomNavigationBar: const BottomNavBar(),
       body: Obx(() {
         if (c.isLoading.value && c.investments.isEmpty) {
           return const Center(child: CircularProgressIndicator());
