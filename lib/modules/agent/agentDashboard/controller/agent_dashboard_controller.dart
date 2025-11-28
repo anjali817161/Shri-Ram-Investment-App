@@ -12,7 +12,10 @@ class AgentDashboardController extends GetxController {
 
   RxList recentInvestments = [].obs;
 
+  String? agentId; // Store agentId for withdrawal
+
   Future<void> fetchDashboard(String agentId) async {
+    this.agentId = agentId; // Store agentId
     isLoading.value = true;
 
     final response = await AuthRepository.getAgentDashboard(agentId);
@@ -30,8 +33,38 @@ class AgentDashboardController extends GetxController {
       avgInvestment.value = dash["avgInvestment"] ?? 0;
 
       recentInvestments.value = dash["recentInvestments"] ?? [];
+      update();
     } else {
       Get.snackbar("Error", "Failed to load dashboard");
+    }
+  }
+
+  Future<void> withdrawAmount(int amount) async {
+    if (agentId == null) {
+      Get.snackbar("Error", "Agent ID not found");
+      return;
+    }
+
+    final body = {
+      "agentId": agentId,
+      "amount": amount,
+    };
+
+    final response = await AuthRepository.AgentWithdraw(body);
+
+    print("💰 WITHDRAW API RESPONSE => $response");
+
+    if (response["statusCode"] == 200 || response["statusCode"] == 201) {
+      final data = response["data"];
+      if (data["success"] == true) {
+        Get.snackbar("Success", data["message"] ?? "Withdrawal request submitted");
+        // Refresh dashboard to update commission
+        await fetchDashboard(agentId!);
+      } else {
+        Get.snackbar("Error", data["message"] ?? "Withdrawal failed");
+      }
+    } else {
+      Get.snackbar("Error", "Withdrawal request failed");
     }
   }
 }

@@ -4,6 +4,7 @@ class ApiEndpoints {
   // 🔵 Base URL
   static const String baseUrl = "https://shriraminvestment-app.onrender.com/api/auth/";
   static const String agentBaseUrl = "https://shriraminvestment-app.onrender.com/api/agents/";
+  static const String agentBaseUrl2 = "https://shriraminvestment-app.onrender.com/api/agent/";
 
   // ============================================================
   // 🔐 AUTH
@@ -24,6 +25,7 @@ class ApiEndpoints {
   static const String agentLogin = "login";
   static const String agentProfile = "profile";
     static const String editAgentProfile = "update-profile";
+    static const String withdraw = "withdraw";
 
 
 

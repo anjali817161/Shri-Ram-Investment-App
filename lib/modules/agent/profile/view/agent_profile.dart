@@ -163,8 +163,11 @@ class _AgentProfileViewState extends State<AgentProfileView> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(title, style: TextStyle(color: Colors.white70, fontSize: 15)),
-          Text(value ?? "N/A",
-              style: TextStyle(color: Colors.white, fontSize: 16)),
+          Flexible(
+            child: Text(value ?? "N/A",
+                style: TextStyle(color: Colors.white, fontSize: 16),
+                textAlign: TextAlign.right),
+          ),
         ],
       ),
     );

@@ -69,16 +69,19 @@ final body = {
 }) async {
   isLoading.value = true;
 
-  final body = {
-    "userId": userId,
-    "password": password,
-  };
+ final body = {
+  "userId": userId.trim(),  // always pass as userId
+  "password": password.trim(),
+};
+
+
+  print("📤 Final Body Sent to API: $body");
+  
 
   final response = await AuthRepository.loginAgent(body);
   isLoading.value = false;
 
 print("📥 API Response: $response");
-print("Body Sent: $body");
 print("UserID: $userId, Password: $password");
 print("Status Code: ${response["statusCode"]}");
 print("Response Data: ${response["data"]}");

@@ -630,6 +630,100 @@ static Future<Map<String, dynamic>> getAgentDashboard(String agentId) async {
 }
 
 
+//agent login
+  static Future<Map<String, dynamic>> AgentWithdraw(Map<String, dynamic> body) async {
+  final url = Uri.parse(ApiEndpoints.agentBaseUrl2 + ApiEndpoints.withdraw);
+  final token = await SharedPrefs.getAgentToken() ?? "";
+
+print("🌐 REPOSITORY DEBUG: URL = $url");
+  try {
+    final response = await http.post(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token"
+        },
+      body: jsonEncode(body),
+    );
+
+    return {
+      "statusCode": response.statusCode,
+      "data": jsonDecode(response.body)
+    };
+  } catch (e) {
+    return {"statusCode": 500, "error": e.toString()};
+  }
+}
+
+static Future<Map<String, dynamic>> getWithdrawHistory(String agentId) async {
+  final url = "${ApiEndpoints.agentBaseUrl2}withdraw-history/$agentId";
+
+  try {
+    final response = await http.get(Uri.parse(url));
+
+    print("📥 Withdraw History Response: ${response.body}");
+
+    if (response.statusCode == 200) {
+      return {
+        "statusCode": 200,
+        "data": jsonDecode(response.body),
+      };
+    } else {
+      return {
+        "statusCode": response.statusCode,
+        "data": jsonDecode(response.body),
+      };
+    }
+  } catch (e) {
+    print("❌ Withdraw History Error: $e");
+    return {
+      "statusCode": 500,
+      "data": {"success": false, "message": "Server Error"}
+    };
+  }
+}
+
+static Future<Map<String, dynamic>> fetchInvestments({
+    required String agentId,
+    required String token,
+    int page = 1,
+    int limit = 10,
+    String search = "",
+  }) async {
+    final url =
+        "${ApiEndpoints.agentBaseUrl}investments/$agentId?page=$page&limit=$limit&search=$search";
+
+    print("📡 FETCHING INVESTMENTS URL: $url");
+    print("🔑 TOKEN: $token");
+
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {"Authorization": "Bearer $token"},
+    );
+
+    print("📥 INVESTMENTS API STATUS: ${response.statusCode}");
+    print("📥 INVESTMENTS API RESPONSE: ${response.body}");
+
+    return {
+      "statusCode": response.statusCode,
+      ...jsonDecode(response.body),
+    };
+  }
+
+  static Future<Map<String, dynamic>> performAction({
+    required String id,
+    required String action,
+    required String token,
+  }) async {
+    final url = "${ApiEndpoints.agentBaseUrl}investments/$id/$action";
+
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {"Authorization": "Bearer $token"},
+    );
+
+    return jsonDecode(response.body);
+  }
 
 
 }

@@ -2,11 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shreeram_investment_app/modules/agent/agent_login/view/agent_login.dart';
+import 'package:shreeram_investment_app/modules/agent/investments/view/all_investment_view.dart';
+import 'package:shreeram_investment_app/modules/agent/profile/controller/agent_profile_controller.dart';
 import 'package:shreeram_investment_app/modules/agent/profile/view/agent_profile.dart';
+import 'package:shreeram_investment_app/modules/agent/withdraw_history/view/withdraw_history_view.dart';
 
-class AgentDrawer extends StatelessWidget {
+class AgentDrawer extends StatefulWidget {
   const AgentDrawer({super.key});
 
+  @override
+  State<AgentDrawer> createState() => _AgentDrawerState();
+}
+
+class _AgentDrawerState extends State<AgentDrawer> {
+
+  final AgentProfileController profileController = Get.put(AgentProfileController());
   void showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -39,9 +49,11 @@ class AgentDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final  agentId = profileController.agent.value?.userId ?? "";
     return Drawer(
       backgroundColor: const Color(0xFF1A1A1A),
       child: ListView(
+        
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
@@ -64,6 +76,23 @@ class AgentDrawer extends StatelessWidget {
             title: const Text("Profile", style: TextStyle(color: Colors.white)),
             onTap: () {
               Get.to(() => AgentProfileView());
+            },
+          ),
+           // PROFILE
+          ListTile(
+            leading: const Icon(Icons.money_outlined, color: Colors.white70),
+            title: const Text("Earnings", style: TextStyle(color: Colors.white)),
+            onTap: () {
+            
+              Get.to(() => WithdrawHistoryView(agentId: agentId));
+            },
+          ),
+           // PROFILE
+          ListTile(
+            leading: const Icon(Icons.person_3_sharp, color: Colors.white70),
+            title: const Text("Clients", style: TextStyle(color: Colors.white)),
+            onTap: () {
+              Get.to(() => AgentInvestmentsView( agentId: agentId,));
             },
           ),
 
