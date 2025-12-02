@@ -29,8 +29,8 @@ class ReferEarnScreen extends StatelessWidget {
 
   // 🔥 UNIQUE STATIC TEXT
   final String shareMessage =
-      "Hey! Earn ₹5000 instantly by investing in secure bonds with me on Shriram Investment App. "
-      "Use my code 👉 SHREE123 and get reward benefits! 🚀📈";
+      "Hey! Invest in secure bonds with me on Shriram Investment App. "
+      "Use my code 👉 SHREE123 and get reward benefits! Explore more at https://shriraminvestment.com/ 🚀📈";
 
   @override
   Widget build(BuildContext context) {
