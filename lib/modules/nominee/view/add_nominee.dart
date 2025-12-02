@@ -151,8 +151,8 @@ class _AddNomineeScreenState extends State<AddNomineeScreen> {
                   const SizedBox(width: 10),
 
                   Expanded(
-                    child: _buildBlackButton("Complete", onTap: () {
-                      controller.submitNominee();
+                    child: _buildBlackButton("Complete", onTap: () async {
+                      await controller.submitNominee();
                     }),
                   ),
                 ],

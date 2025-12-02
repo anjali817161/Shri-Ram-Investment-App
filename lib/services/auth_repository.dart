@@ -348,7 +348,7 @@ Future<Map<String, dynamic>> submitBankDetails(
   }
 
 
-Future<http.StreamedResponse> uploadKycDocuments({
+Future<Map<String, dynamic>> uploadKycDocuments({
   required String userId,
   required File aadhaarFront,
   required File aadhaarBack,
@@ -391,11 +391,14 @@ Future<http.StreamedResponse> uploadKycDocuments({
 
   print("Status Code: ${response.statusCode}");
 
-  // Convert response stream to string body for debugging
+  // Convert response stream to string body
   final respStr = await response.stream.bytesToString();
   print("Response Body: $respStr");
 
-  return response;
+  return {
+    "statusCode": response.statusCode,
+    "data": jsonDecode(respStr),
+  };
 }
 
 //submit nominee details
@@ -450,6 +453,8 @@ Future<http.StreamedResponse> uploadKycDocuments({
     };
   }
 }
+
+
  // Fetch all investments for a user
   Future<Map<String, dynamic>> fetchUserInvestments({
     required String userId,

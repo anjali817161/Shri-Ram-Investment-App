@@ -65,14 +65,14 @@ class SharedPrefs {
 
 
 //set kyc status
-  static const String keyKycStatus = "kycStatus";
-
-static Future<void> setKycStatus(String status) async {
-  await _prefs?.setString(keyKycStatus, status);
+ static Future<void> setBankVerifyStatus(String value) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setString("verified", value);
 }
 
-static String? getKycStatus() {
-  return _prefs?.getString(keyKycStatus);
+static Future<String?> getBankVerifyStatusAsync() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getString("verified");
 }
 
 

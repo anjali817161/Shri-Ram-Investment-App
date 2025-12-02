@@ -145,20 +145,22 @@ class _AgentDashboardViewState extends State<AgentDashboardView>
                       fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                ElevatedButton(
-                  onPressed: () => _showImagePreview(item['image']),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    "View",
-                    style: TextStyle(color: Colors.black, fontSize: 12),
-                  ),
-                ),
+                // GestureDetector(
+                //   onTap: () => _showImagePreview(item['image']),
+                //   child: Container(
+                //     width: 40,
+                //     height: 40,
+                //     decoration: const BoxDecoration(
+                //       color: Colors.black,
+                //       shape: BoxShape.circle,
+                //     ),
+                //     child: const Icon(
+                //       Icons.visibility,
+                //       color: Colors.white,
+                //       size: 20,
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),

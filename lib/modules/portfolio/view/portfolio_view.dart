@@ -52,7 +52,25 @@ class _PortfolioViewState extends State<PortfolioView> {
                 const SizedBox(height: 6),
 
                 /// ---------- ACTIVE INVESTMENT STATS (unchanged) ----------
-                Text("Active investments", style: TextStyle(color: Colors.grey.shade400)),
+                Row(
+                  children: [
+                    Text("Active investments", style: TextStyle(color: Colors.grey.shade400)),
+                    Container(
+                      margin: const EdgeInsets.only(left: 8),
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.green.shade600,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        "SEBI Regitered",
+                        style: const TextStyle(
+                            color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                      ),
+                    )
+                  ],
+                ),
                 const SizedBox(height: 12),
 
                 Row(
@@ -79,6 +97,28 @@ class _PortfolioViewState extends State<PortfolioView> {
                 /// ---------- REPLACED SECTION END ----------
 
                 const SizedBox(height: 20),
+
+               /// ---------- TOTAL INVESTMENT STATS ----------
+                // Text("Overall investments", style: TextStyle(color: Colors.grey.shade400)),
+                // const SizedBox(height: 12),
+
+                // Row(
+                //   children: [
+                //     _statCard(
+                //   "+  ₹${c.activeInvestment}",
+                //       "Monthly cumulative gain",
+                //     ),
+                //     const SizedBox(width: 8),
+                //     _statCard(
+                //       "₹${active != null ? c.calculateGainsAndTotal(active)['total'] : '0'}",
+                //       "Cumulative current value",
+                //     ),
+                //     const SizedBox(width: 8),
+                //     _statCard("₹${active?.investedAmount ?? 0}", "Invested"),
+                //   ],
+                // ),
+
+                // const SizedBox(height: 20),
 
                 if (c.pending.value)
                   Container(

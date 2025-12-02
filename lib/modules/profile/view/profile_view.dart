@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shreeram_investment_app/main.dart';
 import 'package:shreeram_investment_app/modules/auth/bank_info/bank_info.dart';
 import 'package:shreeram_investment_app/modules/auth/login/login_screen.dart';
 import 'package:shreeram_investment_app/modules/bankdetails/view/bank_details.dart';
@@ -8,6 +9,7 @@ import 'package:shreeram_investment_app/modules/home/view/home_view.dart';
 import 'package:shreeram_investment_app/modules/profile/widgets/documents_page.dart';
 import 'package:shreeram_investment_app/modules/profile/widgets/general_details.dart';
 import 'package:shreeram_investment_app/modules/refer/view/refer_page.dart';
+import 'package:shreeram_investment_app/services/sharedPreferences.dart';
 import '../controller/profile_controller.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -17,7 +19,7 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfilePageState extends State<ProfilePage> with RouteAware {
   final ProfileController controller = Get.put(ProfileController());
 
   bool isKycCompleted = false;
@@ -29,24 +31,45 @@ class _ProfilePageState extends State<ProfilePage> {
     _loadKycStatus(); // 🔹 Load saved KYC status
   }
 
-  Future<void> _loadKycStatus() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final status = prefs.getString("kycStatus") ?? "pending";
-
-    setState(() {
-      isKycCompleted = status == "completed";
-    });
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) {
+      routeObserver.subscribe(this, route);
+    }
   }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    // Called when the current route has been popped off, and the current route shows up again
+    _loadKycStatus(); // Reload KYC status when coming back to this page
+  }
+
+Future<void> _loadKycStatus() async {
+  String? status = await SharedPrefs.getBankVerifyStatusAsync();
+
+  setState(() {
+    isKycCompleted = (status?.toLowerCase() == "verified");
+  });
+}
+
+
 
   /// 🔹 Call this when user finishes KYC steps
-  Future<void> markKycCompleted() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString("kycStatus", "completed");
+  // Future<void> markKycCompleted() async {
+  //   await SharedPrefs.setKycStatus("Verified");
 
-    setState(() {
-      isKycCompleted = true;
-    });
-  }
+  //   setState(() {
+  //     isKycCompleted = true;
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -124,20 +147,17 @@ class _ProfilePageState extends State<ProfilePage> {
                           Get.to(() => BankDetailsPage());
                         },
                   child: Container(
-                    decoration: BoxDecoration(
-                      color: isKycCompleted
-                          ? Colors.green
-                          : Colors.red.shade400,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 6),
-                    child: Text(
-                      isKycCompleted ? "KYC Completed" : "KYC Pending",
-                      style: const TextStyle(
-                          color: Colors.white, fontSize: 12),
-                    ),
-                  ),
+  decoration: BoxDecoration(
+    color: isKycCompleted ? Colors.green : Colors.red.shade400,
+    borderRadius: BorderRadius.circular(6),
+  ),
+  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+  child: Text(
+    isKycCompleted ? "KYC Completed" : "KYC Pending",
+    style: TextStyle(color: Colors.white, fontSize: 12),
+  ),
+),
+
                 ),
               ],
             ),
@@ -152,13 +172,13 @@ class _ProfilePageState extends State<ProfilePage> {
                 Get.to(() => GeneralDetailsPage());
               },
             ),
-            _buildMenuItem(
-              icon: Icons.account_balance_outlined,
-              title: "Bank details",
-              onTap: () {
-                Get.to(() => BankInfoPage());
-              },
-            ),
+            // _buildMenuItem(
+            //   icon: Icons.account_balance_outlined,
+            //   title: "Bank details",
+            //   onTap: () {
+            //     Get.to(() => BankInfoPage());
+            //   },
+            // ),
             _buildMenuItem(
               icon: Icons.file_download_outlined,
               title: "Reports & documents",
@@ -236,7 +256,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 SharedPreferences prefs =
                     await SharedPreferences.getInstance();
                 await prefs.remove("token");
-                await prefs.remove("kycStatus");
+                await prefs.remove("bankVerifyStatus");
 
                 Get.offAll(() => LoginScreen());
               },

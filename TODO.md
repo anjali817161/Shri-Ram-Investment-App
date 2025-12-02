@@ -1,11 +1,5 @@
-# TODO for Monthly Report PDF Generation Feature
+# TODO: Update Add Nominee API Controller and View
 
-- [ ] Add method `PdfGenerator.generateMonthlyReport` to generate PDF for a monthly investment report.
-- [ ] Add method `DocumentController.generateMonthlyReportPdf` to generate monthly report PDF locally using `PdfGenerator`.
-- [ ] Add method `PortfolioInvestmentController.generateMonthlyReportPdf` to collect required monthly data and call DocumentController.
-- [ ] Modify `portfolio_view.dart` `_showMonthActions` to call the new monthly report generation method for the "Download PDF" button on monthly items.
-
-Testing:
-- [ ] Test clicking a month from portfolio page monthly breakdown generates correct monthly PDF report.
-- [ ] Ensure no API calls during monthly PDF generation.
-- [ ] Verify no regressions on existing overall PDF report generation.
+1. ✅ Update nominee_controller.dart: Change date of birth format from YYYY-MM-DD to DD-MM-YYYY in submitNominee method.
+2. ✅ Update nominee_controller.dart: Rename 'proofDigits' parameter to 'proofLast4Digits' in the AuthRepository().submitNomineeDetails API call.
+3. ✅ Update add_nominee.dart: Change the hint text for the proof text field to "Last 4 digits" for all proof types.

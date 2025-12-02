@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:shreeram_investment_app/modules/nominee/view/add_nominee.dart';
 import 'package:shreeram_investment_app/services/auth_repository.dart';
+import 'package:shreeram_investment_app/services/sharedPreferences.dart';
 
 class KycController extends GetxController {
   Rx<File?> adharFront = Rx<File?>(null);
@@ -48,12 +50,19 @@ class KycController extends GetxController {
 
       isLoading.value = false;
 
-      if (res.statusCode == 200 || res.statusCode == 201) {
+      if (res["statusCode"] == 200 || res["statusCode"] == 201) {
+        // Parse response to get bankVerifyStatus
+        final data = res["data"];
+        final status = data["kyc"]["bankVerifyStatus"] ?? "pending";
+
+        // SAVE KYC STATUS
+        await SharedPrefs.setBankVerifyStatus(status);
+
+        // Navigate first to avoid snackbar state issues
+        Get.to(() => AddNomineeScreen());
+
         Get.snackbar("Success", "Documents uploaded successfully!",
             backgroundColor: Colors.green, colorText: Colors.white);
-
-        await Future.delayed(Duration(seconds: 1));
-        Get.to(() => AddNomineeScreen());
       } else {
         Get.snackbar("Error", "Something went wrong!",
             backgroundColor: Colors.red, colorText: Colors.white);

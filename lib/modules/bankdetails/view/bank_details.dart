@@ -85,10 +85,10 @@ class _BankDetailsPageState extends State<BankDetailsPage> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Get.back(),
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back, color: Colors.white),
+        //   onPressed: () => Get.back(),
+        // ),
         title: const Text(
           "Bank verification",
           style: TextStyle(color: Colors.white, fontSize: 18),

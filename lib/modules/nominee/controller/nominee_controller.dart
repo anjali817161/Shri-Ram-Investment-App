@@ -17,7 +17,7 @@ class NomineeController extends GetxController {
   // Dropdown and checkbox values
   String? selectedRelation;
   String? selectedProof = "Aadhaar";
-  bool sameAddress = false;
+  bool sameAddress = true;
 
   Future<void> submitNominee() async {
   // Validate fields
@@ -39,7 +39,7 @@ class NomineeController extends GetxController {
     return;
   }
 
-  String dob = "${dobDDCtrl.text}-${dobMMCtrl.text}-${dobYYCtrl.text}";
+  String dob = "${dobDDCtrl.text.padLeft(2, '0')}-${dobMMCtrl.text.padLeft(2, '0')}-${dobYYCtrl.text}";
 
   // API call
   final response = await AuthRepository().submitNomineeDetails(
@@ -49,7 +49,7 @@ class NomineeController extends GetxController {
     dob: dob,
     proofType: selectedProof!,
     proofDigits: lastDigitsCtrl.text,
-    addressSame: sameAddress,
+    addressSame: sameAddress, 
   );
 
   print("Nominee Submission Status: ${response['status']}");
@@ -57,7 +57,7 @@ class NomineeController extends GetxController {
 
   if (response['status'] == 200 || response['status'] == 201) {
     // ✅ SAVE KYC STATUS HERE
-    await SharedPrefs.setKycStatus("completed");
+    // await SharedPrefs.setKycStatus("completed");
 
     Get.snackbar("Success", "Nominee added successfully!");
     

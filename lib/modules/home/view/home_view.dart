@@ -55,7 +55,7 @@ class InvestmentHomeScreen extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Image.asset('assets/images/shri_icon.png', height: 45),
+                      Image.asset('assets/images/shri_icon.png', height: 50),
                      SizedBox(width: 128,),
                       const Text(
                         "Shri Ram Investment",
@@ -182,66 +182,103 @@ class InvestmentHomeScreen extends StatelessWidget {
               const SizedBox(height: 20),
 
               // 🔹 Bond Card
-              Obx(() {
-                final bond = controller.bonds.first;
-                return Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1C1C1E),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Align(
-                        alignment: Alignment.topRight,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.amber[800],
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            bond.status,
-                            style: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text("${bond.rate.toStringAsFixed(2)}%",
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 36,
-                              fontWeight: FontWeight.bold)),
-                      const Text("YTM upto",
-                          style: TextStyle(color: Colors.white54, fontSize: 14)),
-                      const SizedBox(height: 8),
-                      Text("Maturity: ${bond.maturity}",
-                          style: const TextStyle(
-                              color: Colors.white70, fontSize: 14)),
-                      const SizedBox(height: 10),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(bond.name,
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16)),
-                          Text("₹${bond.minInvestment.toStringAsFixed(0)} min. investment",
-                              style: const TextStyle(
-                                  color: Colors.white60, fontSize: 14)),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              }),
+             Obx(() {
+  final bond = controller.bonds.first;
+  return Container(
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: const Color(0xFF1C1C1E),
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        /// 🔹 Top Row — SEBI Registered + Status
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            /// 🟩 SEBI Registered Tag
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.green[600],
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: const Text(
+                "SEBI Registered",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                ),
+              ),
+            ),
+
+            /// 🟨 Bond Status Tag
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.amber[800],
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                bond.status,
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 10),
+
+        Text(
+          "${bond.rate.toStringAsFixed(2)}%",
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 36,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const Text(
+          "YTM upto",
+          style: TextStyle(color: Colors.white54, fontSize: 14),
+        ),
+
+        const SizedBox(height: 8),
+
+        Text(
+          "Maturity: ${bond.maturity}",
+          style: const TextStyle(color: Colors.white70, fontSize: 14),
+        ),
+
+        const SizedBox(height: 10),
+
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              bond.name,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+            Text(
+              "₹${bond.minInvestment.toStringAsFixed(0)} min. investment",
+              style: const TextStyle(color: Colors.white60, fontSize: 14),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+}),
+
               const SizedBox(height: 30),
 
               // 🔹 Categories
@@ -326,7 +363,7 @@ class InvestmentHomeScreen extends StatelessWidget {
                               children: [
                                 Row(
                                   children: [
-                                     Image.asset(item["image"], height: 35),
+                                     Image.asset(item["image"], height: 40),
                        SizedBox(width: 12,),
                                     Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,

@@ -5,6 +5,8 @@ import 'package:shreeram_investment_app/modules/onboarding/view/onboarding_view.
 import 'package:shreeram_investment_app/modules/theme/app_theme.dart';
 import 'package:shreeram_investment_app/services/sharedPreferences.dart';
 
+final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SharedPrefs.init();
@@ -24,6 +26,7 @@ class MyApp extends StatelessWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.dark,
       home: const OnboardingView(),
+      navigatorObservers: [routeObserver],
     );
   }
 }
